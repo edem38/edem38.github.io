@@ -638,6 +638,135 @@
             color: var(--accent-purple);
         }
 
+        /* Learn Linux Section */
+        #learn {
+            background: var(--bg-secondary);
+        }
+
+        .learn-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .learn-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .learn-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .learn-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .learn-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .terminal-card:hover {
+            border-color: var(--accent-green);
+            box-shadow: 0 20px 60px rgba(34, 197, 94, 0.2);
+        }
+
+        .quiz-card:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.2);
+        }
+
+        .learn-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .learn-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .learn-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .learn-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+
+        .learn-features li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .learn-features li:last-child {
+            border-bottom: none;
+        }
+
+        .learn-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .terminal-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+        }
+
+        .terminal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(34, 197, 94, 0.4);
+        }
+
+        .quiz-btn {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: var(--bg-primary);
+            box-shadow: 0 4px 20px var(--glow-cyan);
+        }
+
+        .quiz-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px var(--glow-cyan);
+        }
+
+        .learn-btn span {
+            font-size: 1.3rem;
+        }
+
         /* Responsive */
         @media (max-width: 900px) {
             nav {
@@ -710,6 +839,7 @@
         <ul class="nav-links">
             <li><a href="#about">À propos</a></li>
             <li><a href="#projects">Projets</a></li>
+            <li><a href="#learn">Apprendre</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
     </nav>
@@ -799,7 +929,7 @@
                         <span>⏳</span> Patiente quelques secondes au lancement du jeu
                     </div>
                     <div class="project-links">
-                        <a href="https://age-of-empire.onrender.com/" target="_blank" class="project-link play-btn">🎮 Jouer maintenant</a>
+                        <a href="https://rts-medieval.onrender.com" target="_blank" class="project-link play-btn">🎮 Jouer maintenant</a>
                     </div>
                 </div>
             </article>
@@ -826,6 +956,50 @@
                     </div>
                 </div>
             </article>
+        </div>
+    </section>
+
+    <!-- Learn Linux Section -->
+    <section id="learn">
+        <div class="section-header">
+            <h2>Apprendre <span>Linux</span></h2>
+            <p>Teste tes connaissances et pratique les commandes Linux</p>
+        </div>
+        <div class="learn-container">
+            <div class="learn-card terminal-card">
+                <div class="learn-icon">🖥️</div>
+                <h3>Simulateur Terminal</h3>
+                <p>
+                    Un terminal Linux interactif dans ton navigateur. 
+                    Pratique les commandes de base : ls, cd, cat, mkdir, rm et bien plus !
+                </p>
+                <ul class="learn-features">
+                    <li>✅ +30 commandes Linux</li>
+                    <li>✅ Système de fichiers virtuel</li>
+                    <li>✅ Commandes Docker & K8s</li>
+                    <li>✅ Autocomplétion avec Tab</li>
+                </ul>
+                <a href="terminal.html" class="learn-btn terminal-btn">
+                    <span>🐧</span> Lancer le Terminal
+                </a>
+            </div>
+            <div class="learn-card quiz-card">
+                <div class="learn-icon">🎯</div>
+                <h3>Quiz Linux</h3>
+                <p>
+                    Teste tes connaissances avec des quiz interactifs. 
+                    4 niveaux de difficulté : Débutant à Expert DevOps !
+                </p>
+                <ul class="learn-features">
+                    <li>⭐ Niveau Débutant</li>
+                    <li>⭐⭐ Niveau Intermédiaire</li>
+                    <li>⭐⭐⭐ Niveau Avancé</li>
+                    <li>🔥 Niveau Expert DevOps</li>
+                </ul>
+                <a href="linux-quiz.html" class="learn-btn quiz-btn">
+                    <span>🎮</span> Lancer le Quiz
+                </a>
+            </div>
         </div>
     </section>
 
@@ -856,3 +1030,9 @@
         </div>
     </section>
 
+    <!-- Footer -->
+    <footer>
+        <p>Fait avec <span class="heart">♥</span> par edem38 — 2025</p>
+    </footer>
+</body>
+</html>
