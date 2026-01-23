@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Command Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-terminal: #0c0c14;
+            --bg-header: #1a1a24;
+            --bg-card: #12121a;
+            --text-primary: #e0e0e0;
+            --text-green: #4ade80;
+            --text-cyan: #22d3ee;
+            --text-yellow: #facc15;
+            --text-red: #f87171;
+            --text-purple: #c084fc;
+            --text-blue: #60a5fa;
+            --text-orange: #fb923c;
+            --border-color: #2a2a3a;
+            --glow-green: rgba(74, 222, 128, 0.3);
+            --glow-cyan: rgba(34, 211, 238, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header h1 span {
+            color: var(--text-green);
+        }
+
+        .page-header p {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        /* Level Selection */
+        .level-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .level-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .level-card.beginner {
+            border-color: var(--text-green);
+        }
+        .level-card.beginner:hover {
+            box-shadow: 0 10px 40px rgba(74, 222, 128, 0.2);
+        }
+
+        .level-card.intermediate {
+            border-color: var(--text-yellow);
+        }
+        .level-card.intermediate:hover {
+            box-shadow: 0 10px 40px rgba(250, 204, 21, 0.2);
+        }
+
+        .level-card.advanced {
+            border-color: var(--text-orange);
+        }
+        .level-card.advanced:hover {
+            box-shadow: 0 10px 40px rgba(251, 146, 60, 0.2);
+        }
+
+        .level-card.expert {
+            border-color: var(--text-red);
+        }
+        .level-card.expert:hover {
+            box-shadow: 0 10px 40px rgba(248, 113, 113, 0.2);
+        }
+
+        .level-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .level-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .level-card.beginner h3 { color: var(--text-green); }
+        .level-card.intermediate h3 { color: var(--text-yellow); }
+        .level-card.advanced h3 { color: var(--text-orange); }
+        .level-card.expert h3 { color: var(--text-red); }
+
+        .level-card p {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .level-card .stars {
+            font-size: 1.2rem;
+        }
+
+        /* Quiz Container */
+        .quiz-container {
+            display: none;
+        }
+
+        .quiz-container.active {
+            display: block;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .stat-value.score { color: var(--text-green); }
+        .stat-value.question { color: var(--text-cyan); }
+        .stat-value.streak { color: var(--text-orange); }
+        .stat-value.timer { color: var(--text-yellow); }
+
+        .streak-fire {
+            font-size: 1.2rem;
+            animation: fire 0.5s ease infinite alternate;
+        }
+
+        @keyframes fire {
+            from { transform: scale(1); }
+            to { transform: scale(1.2); }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: var(--bg-card);
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--text-green), var(--text-cyan));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Question Card */
+        .question-card {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .question-header {
+            background: var(--bg-header);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .question-number {
+            background: var(--text-cyan);
+            color: var(--bg-primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .question-difficulty {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .question-difficulty.easy { background: rgba(74, 222, 128, 0.2); color: var(--text-green); }
+        .question-difficulty.medium { background: rgba(250, 204, 21, 0.2); color: var(--text-yellow); }
+        .question-difficulty.hard { background: rgba(251, 146, 60, 0.2); color: var(--text-orange); }
+        .question-difficulty.expert { background: rgba(248, 113, 113, 0.2); color: var(--text-red); }
+
+        .question-points {
+            margin-left: auto;
+            color: var(--text-yellow);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .question-body {
+            padding: 2rem;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .question-hint {
+            background: rgba(34, 211, 238, 0.1);
+            border-left: 3px solid var(--text-cyan);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.95rem;
+            color: #aaa;
+        }
+
+        .question-hint code {
+            background: var(--bg-card);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-cyan);
+        }
+
+        /* Answer Input */
+        .answer-section {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .terminal-prompt {
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .prompt-user { color: var(--text-cyan); }
+        .prompt-at { color: var(--text-primary); }
+        .prompt-host { color: var(--text-cyan); }
+        .prompt-colon { color: var(--text-primary); }
+        .prompt-path { color: var(--text-purple); }
+        .prompt-symbol { color: var(--text-green); }
+
+        .answer-input {
+            flex: 1;
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .answer-input:focus {
+            border-color: var(--text-cyan);
+        }
+
+        .answer-input.correct {
+            border-color: var(--text-green);
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .answer-input.incorrect {
+            border-color: var(--text-red);
+            background: rgba(248, 113, 113, 0.1);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--text-green), var(--text-cyan));
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--bg-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px var(--glow-green);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Feedback */
+        .feedback {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback.correct {
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid var(--text-green);
+        }
+
+        .feedback.incorrect {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid var(--text-red);
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .feedback.correct .feedback-header { color: var(--text-green); }
+        .feedback.incorrect .feedback-header { color: var(--text-red); }
+
+        .feedback-text {
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .feedback-text code {
+            background: var(--bg-card);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-green);
+        }
+
+        .next-btn {
+            margin-top: 1rem;
+            background: var(--bg-card);
+            border: 2px solid var(--text-cyan);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-cyan);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn:hover {
+            background: var(--text-cyan);
+            color: var(--bg-primary);
+        }
+
+        /* Results Screen */
+        .results-screen {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .results-screen.active {
+            display: block;
+        }
+
+        .results-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .results-title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .results-subtitle {
+            color: #888;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .result-stat {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .result-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-cyan);
+        }
+
+        .result-stat-label {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .results-grade {
+            font-size: 1.5rem;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 2rem;
+        }
+
+        .results-grade.excellent {
+            background: rgba(74, 222, 128, 0.2);
+            color: var(--text-green);
+            border: 2px solid var(--text-green);
+        }
+
+        .results-grade.good {
+            background: rgba(34, 211, 238, 0.2);
+            color: var(--text-cyan);
+            border: 2px solid var(--text-cyan);
+        }
+
+        .results-grade.average {
+            background: rgba(250, 204, 21, 0.2);
+            color: var(--text-yellow);
+            border: 2px solid var(--text-yellow);
+        }
+
+        .results-grade.poor {
+            background: rgba(248, 113, 113, 0.2);
+            color: var(--text-red);
+            border: 2px solid var(--text-red);
+        }
+
+        .results-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, var(--text-green), var(--text-cyan));
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--bg-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px var(--glow-green);
+        }
+
+        .home-btn {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .home-btn:hover {
+            border-color: var(--text-cyan);
+            color: var(--text-cyan);
+        }
+
+        /* Timer animation */
+        .timer-warning {
+            animation: pulse-red 0.5s ease infinite;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { color: var(--text-yellow); }
+            50% { color: var(--text-red); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .stats-bar {
+                justify-content: center;
+            }
+
+            .answer-section {
+                flex-direction: column;
+            }
+
+            .terminal-prompt {
+                display: none;
+            }
+
+            .answer-input {
+                width: 100%;
+            }
+
+            .submit-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>🐧 Linux <span>Quiz</span></h1>
+            <p>Teste tes connaissances en commandes Linux !</p>
+        </div>
+
+        <!-- Level Selection -->
+        <div class="level-selection" id="levelSelection">
+            <div class="level-card beginner" onclick="startQuiz('beginner')">
+                <div class="level-icon">🌱</div>
+                <h3>Débutant</h3>
+                <p>Commandes de base : ls, cd, pwd, cat...</p>
+                <div class="stars">⭐</div>
+            </div>
+            <div class="level-card intermediate" onclick="startQuiz('intermediate')">
+                <div class="level-icon">🌿</div>
+                <h3>Intermédiaire</h3>
+                <p>Fichiers, permissions, recherche...</p>
+                <div class="stars">⭐⭐</div>
+            </div>
+            <div class="level-card advanced" onclick="startQuiz('advanced')">
+                <div class="level-icon">🌳</div>
+                <h3>Avancé</h3>
+                <p>Réseau, processus, scripts...</p>
+                <div class="stars">⭐⭐⭐</div>
+            </div>
+            <div class="level-card expert" onclick="startQuiz('expert')">
+                <div class="level-icon">🔥</div>
+                <h3>Expert</h3>
+                <p>DevOps, Docker, Kubernetes...</p>
+                <div class="stars">⭐⭐⭐⭐</div>
+            </div>
+        </div>
+
+        <!-- Quiz Container -->
+        <div class="quiz-container" id="quizContainer">
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-label">Score</span>
+                    <span class="stat-value score" id="score">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Question</span>
+                    <span class="stat-value question"><span id="currentQ">1</span>/<span id="totalQ">10</span></span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Série</span>
+                    <span class="stat-value streak" id="streak">0</span>
+                    <span class="streak-fire" id="streakFire" style="display: none;">🔥</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Temps</span>
+                    <span class="stat-value timer" id="timer">30</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-number" id="questionNumber">Q1</span>
+                    <span class="question-difficulty easy" id="questionDifficulty">Facile</span>
+                    <span class="question-points" id="questionPoints">+10 pts</span>
+                </div>
+                <div class="question-body">
+                    <div class="question-text" id="questionText">
+                        Comment lister les fichiers du répertoire courant ?
+                    </div>
+                    <div class="question-hint" id="questionHint">
+                        💡 <strong>Indice :</strong> Cette commande est l'une des plus utilisées sous Linux.
+                    </div>
+                    <div class="answer-section">
+                        <div class="terminal-prompt">
+                            <span class="prompt-user">user</span><span class="prompt-at">@</span><span class="prompt-host">linux</span><span class="prompt-colon">:</span><span class="prompt-path">~</span><span class="prompt-symbol">$</span>
+                        </div>
+                        <input type="text" class="answer-input" id="answerInput" placeholder="Tape ta commande ici..." autocomplete="off" autofocus>
+                        <button class="submit-btn" id="submitBtn" onclick="checkAnswer()">Valider</button>
+                    </div>
+                    <div class="feedback" id="feedback">
+                        <div class="feedback-header">
+                            <span id="feedbackIcon">✅</span>
+                            <span id="feedbackTitle">Correct !</span>
+                        </div>
+                        <div class="feedback-text" id="feedbackText">
+                            Explication de la réponse...
+                        </div>
+                        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Question suivante →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen" id="resultsScreen">
+            <div class="results-icon" id="resultsIcon">🏆</div>
+            <h2 class="results-title" id="resultsTitle">Quiz terminé !</h2>
+            <p class="results-subtitle" id="resultsSubtitle">Voici tes résultats</p>
+            
+            <div class="results-stats">
+                <div class="result-stat">
+                    <div class="result-stat-value" id="finalScore">0</div>
+                    <div class="result-stat-label">Points</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-stat-value" id="correctAnswers">0/10</div>
+                    <div class="result-stat-label">Bonnes réponses</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-stat-value" id="bestStreak">0</div>
+                    <div class="result-stat-label">Meilleure série</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-stat-value" id="avgTime">0s</div>
+                    <div class="result-stat-label">Temps moyen</div>
+                </div>
+            </div>
+
+            <div class="results-grade excellent" id="resultsGrade">
+                🏆 Expert Linux !
+            </div>
+
+            <div class="results-buttons">
+                <button class="restart-btn" onclick="restartQuiz()">🔄 Rejouer</button>
+                <button class="home-btn" onclick="goHome()">🏠 Changer de niveau</button>
+                <a href="index.html" class="home-btn">← Retour au portfolio</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Questions database
+        const questions = {
+            beginner: [
+                {
+                    question: "Comment lister les fichiers du répertoire courant ?",
+                    hint: "Cette commande de 2 lettres est l'une des plus utilisées sous Linux.",
+                    answers: ["ls"],
+                    explanation: "<code>ls</code> (list) affiche le contenu d'un répertoire.",
+                    points: 10
+                },
+                {
+                    question: "Comment afficher le répertoire de travail actuel ?",
+                    hint: "3 lettres : Print Working Directory",
+                    answers: ["pwd"],
+                    explanation: "<code>pwd</code> (Print Working Directory) affiche le chemin complet du répertoire courant.",
+                    points: 10
+                },
+                {
+                    question: "Comment changer de répertoire vers /home ?",
+                    hint: "Change Directory suivi du chemin...",
+                    answers: ["cd /home", "cd  /home"],
+                    explanation: "<code>cd</code> (Change Directory) permet de naviguer entre les répertoires.",
+                    points: 10
+                },
+                {
+                    question: "Comment afficher le contenu du fichier 'notes.txt' ?",
+                    hint: "Cette commande affiche le contenu d'un fichier... comme un chat qui miaule !",
+                    answers: ["cat notes.txt", "cat  notes.txt"],
+                    explanation: "<code>cat</code> (concatenate) affiche le contenu d'un ou plusieurs fichiers.",
+                    points: 10
+                },
+                {
+                    question: "Comment revenir au répertoire parent ?",
+                    hint: "cd suivi de deux points...",
+                    answers: ["cd ..", "cd  .."],
+                    explanation: "<code>..</code> représente le répertoire parent dans le système de fichiers.",
+                    points: 10
+                },
+                {
+                    question: "Comment créer un fichier vide nommé 'test.txt' ?",
+                    hint: "Tu 'touches' le fichier pour le créer...",
+                    answers: ["touch test.txt", "touch  test.txt"],
+                    explanation: "<code>touch</code> crée un fichier vide ou met à jour la date de modification.",
+                    points: 10
+                },
+                {
+                    question: "Comment créer un dossier nommé 'projet' ?",
+                    hint: "Make Directory...",
+                    answers: ["mkdir projet", "mkdir  projet"],
+                    explanation: "<code>mkdir</code> (Make Directory) crée un nouveau répertoire.",
+                    points: 10
+                },
+                {
+                    question: "Comment afficher l'utilisateur actuellement connecté ?",
+                    hint: "Qui suis-je ? Who am I ?",
+                    answers: ["whoami"],
+                    explanation: "<code>whoami</code> affiche le nom de l'utilisateur courant.",
+                    points: 10
+                },
+                {
+                    question: "Comment effacer l'écran du terminal ?",
+                    hint: "Rendre l'écran... clair !",
+                    answers: ["clear"],
+                    explanation: "<code>clear</code> efface l'affichage du terminal (raccourci: Ctrl+L).",
+                    points: 10
+                },
+                {
+                    question: "Comment aller directement dans ton répertoire personnel ?",
+                    hint: "cd suivi du symbole de la maison...",
+                    answers: ["cd ~", "cd", "cd  ~"],
+                    explanation: "<code>~</code> (tilde) représente le répertoire personnel de l'utilisateur.",
+                    points: 10
+                }
+            ],
+            intermediate: [
+                {
+                    question: "Comment lister tous les fichiers y compris les fichiers cachés ?",
+                    hint: "ls avec une option pour 'all'...",
+                    answers: ["ls -a", "ls -la", "ls -al", "ls  -a", "ls  -la", "ls  -al"],
+                    explanation: "<code>ls -a</code> affiche tous les fichiers, y compris ceux commençant par un point (cachés).",
+                    points: 15
+                },
+                {
+                    question: "Comment copier le fichier 'doc.txt' vers 'backup.txt' ?",
+                    hint: "Copy...",
+                    answers: ["cp doc.txt backup.txt", "cp  doc.txt  backup.txt"],
+                    explanation: "<code>cp</code> (copy) copie des fichiers ou répertoires.",
+                    points: 15
+                },
+                {
+                    question: "Comment déplacer 'fichier.txt' dans le dossier 'documents' ?",
+                    hint: "Move...",
+                    answers: ["mv fichier.txt documents", "mv fichier.txt documents/", "mv  fichier.txt  documents"],
+                    explanation: "<code>mv</code> (move) déplace ou renomme des fichiers.",
+                    points: 15
+                },
+                {
+                    question: "Comment supprimer le fichier 'temp.txt' ?",
+                    hint: "Remove...",
+                    answers: ["rm temp.txt", "rm  temp.txt"],
+                    explanation: "<code>rm</code> (remove) supprime des fichiers. Attention, c'est irréversible !",
+                    points: 15
+                },
+                {
+                    question: "Comment afficher les 10 premières lignes de 'log.txt' ?",
+                    hint: "La tête du fichier...",
+                    answers: ["head log.txt", "head  log.txt"],
+                    explanation: "<code>head</code> affiche les premières lignes d'un fichier (10 par défaut).",
+                    points: 15
+                },
+                {
+                    question: "Comment afficher les 10 dernières lignes de 'log.txt' ?",
+                    hint: "La queue du fichier...",
+                    answers: ["tail log.txt", "tail  log.txt"],
+                    explanation: "<code>tail</code> affiche les dernières lignes d'un fichier (10 par défaut).",
+                    points: 15
+                },
+                {
+                    question: "Comment rechercher le mot 'error' dans 'log.txt' ?",
+                    hint: "Global Regular Expression Print...",
+                    answers: ["grep error log.txt", "grep  error  log.txt", "grep 'error' log.txt", "grep \"error\" log.txt"],
+                    explanation: "<code>grep</code> recherche un motif dans des fichiers.",
+                    points: 15
+                },
+                {
+                    question: "Comment supprimer un dossier 'old' et tout son contenu ?",
+                    hint: "rm avec l'option récursive et forcée...",
+                    answers: ["rm -r old", "rm -rf old", "rm -r  old", "rm -rf  old", "rm  -r  old", "rm  -rf  old"],
+                    explanation: "<code>rm -r</code> supprime récursivement un dossier et son contenu. <code>-f</code> force la suppression.",
+                    points: 15
+                },
+                {
+                    question: "Comment compter le nombre de lignes dans 'data.txt' ?",
+                    hint: "Word Count avec l'option lignes...",
+                    answers: ["wc -l data.txt", "wc  -l  data.txt"],
+                    explanation: "<code>wc -l</code> (word count -lines) compte le nombre de lignes.",
+                    points: 15
+                },
+                {
+                    question: "Comment afficher les fichiers avec leurs permissions détaillées ?",
+                    hint: "ls en format long...",
+                    answers: ["ls -l", "ls  -l"],
+                    explanation: "<code>ls -l</code> affiche les détails : permissions, propriétaire, taille, date...",
+                    points: 15
+                }
+            ],
+            advanced: [
+                {
+                    question: "Comment trouver tous les fichiers .log dans /var ?",
+                    hint: "find avec l'option -name...",
+                    answers: ["find /var -name '*.log'", "find /var -name \"*.log\"", "find /var -name *.log"],
+                    explanation: "<code>find</code> recherche des fichiers selon différents critères.",
+                    points: 20
+                },
+                {
+                    question: "Comment donner les permissions 755 au fichier 'script.sh' ?",
+                    hint: "Change mode...",
+                    answers: ["chmod 755 script.sh", "chmod  755  script.sh"],
+                    explanation: "<code>chmod 755</code> donne rwx au propriétaire et rx aux autres.",
+                    points: 20
+                },
+                {
+                    question: "Comment afficher l'espace disque utilisé de façon lisible ?",
+                    hint: "Disk Free avec human-readable...",
+                    answers: ["df -h", "df  -h"],
+                    explanation: "<code>df -h</code> affiche l'espace disque en format lisible (Ko, Mo, Go).",
+                    points: 20
+                },
+                {
+                    question: "Comment afficher la mémoire RAM utilisée en format lisible ?",
+                    hint: "free avec human-readable...",
+                    answers: ["free -h", "free  -h"],
+                    explanation: "<code>free -h</code> affiche l'utilisation de la mémoire en format lisible.",
+                    points: 20
+                },
+                {
+                    question: "Comment lister tous les processus en cours ?",
+                    hint: "Process Status avec toutes les options...",
+                    answers: ["ps aux", "ps  aux", "ps -aux"],
+                    explanation: "<code>ps aux</code> liste tous les processus de tous les utilisateurs.",
+                    points: 20
+                },
+                {
+                    question: "Comment tuer le processus avec le PID 1234 ?",
+                    hint: "Kill suivi du PID...",
+                    answers: ["kill 1234", "kill  1234"],
+                    explanation: "<code>kill</code> envoie un signal à un processus (par défaut SIGTERM).",
+                    points: 20
+                },
+                {
+                    question: "Comment télécharger un fichier depuis une URL avec wget ?",
+                    hint: "wget suivi de l'URL...",
+                    answers: ["wget https://example.com/file", "wget http://example.com/file", "wget example.com/file"],
+                    explanation: "<code>wget</code> télécharge des fichiers depuis le web.",
+                    points: 20
+                },
+                {
+                    question: "Comment afficher les connexions réseau actives et les ports ouverts ?",
+                    hint: "Network Statistics avec options tulpn...",
+                    answers: ["netstat -tulpn", "netstat  -tulpn", "ss -tulpn"],
+                    explanation: "<code>netstat -tulpn</code> ou <code>ss -tulpn</code> affiche les ports en écoute.",
+                    points: 20
+                },
+                {
+                    question: "Comment créer un lien symbolique 'link' pointant vers 'fichier' ?",
+                    hint: "ln avec l'option symbolic...",
+                    answers: ["ln -s fichier link", "ln  -s  fichier  link"],
+                    explanation: "<code>ln -s</code> crée un lien symbolique (raccourci).",
+                    points: 20
+                },
+                {
+                    question: "Comment archiver le dossier 'projet' dans 'projet.tar.gz' ?",
+                    hint: "tar avec create, gzip, verbose, file...",
+                    answers: ["tar -czvf projet.tar.gz projet", "tar czvf projet.tar.gz projet", "tar -czf projet.tar.gz projet"],
+                    explanation: "<code>tar -czvf</code> crée une archive compressée avec gzip.",
+                    points: 20
+                }
+            ],
+            expert: [
+                {
+                    question: "Comment lister les containers Docker en cours d'exécution ?",
+                    hint: "docker avec process status...",
+                    answers: ["docker ps", "docker  ps"],
+                    explanation: "<code>docker ps</code> liste les containers actifs. Ajoute <code>-a</code> pour tous les containers.",
+                    points: 25
+                },
+                {
+                    question: "Comment lancer un container nginx en arrière-plan sur le port 80 ?",
+                    hint: "docker run avec detach et port mapping...",
+                    answers: ["docker run -d -p 80:80 nginx", "docker run -d -p80:80 nginx", "docker run -dp 80:80 nginx"],
+                    explanation: "<code>-d</code> lance en arrière-plan, <code>-p 80:80</code> mappe le port.",
+                    points: 25
+                },
+                {
+                    question: "Comment afficher les logs d'un container nommé 'web' ?",
+                    hint: "docker logs...",
+                    answers: ["docker logs web", "docker  logs  web"],
+                    explanation: "<code>docker logs</code> affiche les logs d'un container.",
+                    points: 25
+                },
+                {
+                    question: "Comment lister les pods Kubernetes dans le namespace actuel ?",
+                    hint: "kubectl get...",
+                    answers: ["kubectl get pods", "kubectl  get  pods", "kubectl get pod"],
+                    explanation: "<code>kubectl get pods</code> liste les pods du namespace courant.",
+                    points: 25
+                },
+                {
+                    question: "Comment appliquer un fichier de configuration Kubernetes 'deploy.yaml' ?",
+                    hint: "kubectl apply...",
+                    answers: ["kubectl apply -f deploy.yaml", "kubectl  apply  -f  deploy.yaml"],
+                    explanation: "<code>kubectl apply -f</code> applique une configuration depuis un fichier.",
+                    points: 25
+                },
+                {
+                    question: "Comment afficher les logs d'un pod nommé 'api-pod' ?",
+                    hint: "kubectl logs...",
+                    answers: ["kubectl logs api-pod", "kubectl  logs  api-pod"],
+                    explanation: "<code>kubectl logs</code> affiche les logs d'un pod.",
+                    points: 25
+                },
+                {
+                    question: "Comment entrer en mode interactif dans un container Docker 'app' ?",
+                    hint: "docker exec avec interactive et tty...",
+                    answers: ["docker exec -it app bash", "docker exec -it app sh", "docker exec -it app /bin/bash", "docker exec -it app /bin/sh"],
+                    explanation: "<code>docker exec -it</code> ouvre un shell interactif dans le container.",
+                    points: 25
+                },
+                {
+                    question: "Comment lancer un playbook Ansible 'deploy.yml' ?",
+                    hint: "ansible-playbook...",
+                    answers: ["ansible-playbook deploy.yml", "ansible-playbook  deploy.yml"],
+                    explanation: "<code>ansible-playbook</code> exécute un playbook Ansible.",
+                    points: 25
+                },
+                {
+                    question: "Comment initialiser un projet Terraform dans le dossier actuel ?",
+                    hint: "terraform init...",
+                    answers: ["terraform init", "terraform  init"],
+                    explanation: "<code>terraform init</code> initialise le répertoire de travail Terraform.",
+                    points: 25
+                },
+                {
+                    question: "Comment construire une image Docker avec le tag 'myapp:v1' depuis le Dockerfile actuel ?",
+                    hint: "docker build avec tag...",
+                    answers: ["docker build -t myapp:v1 .", "docker build -t myapp:v1  .", "docker build --tag myapp:v1 ."],
+                    explanation: "<code>docker build -t</code> construit une image avec un tag spécifié.",
+                    points: 25
+                }
+            ]
+        };
+
+        // Game state
+        let currentLevel = 'beginner';
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let bestStreak = 0;
+        let correctCount = 0;
+        let totalTime = 0;
+        let questionTimes = [];
+        let timer = 30;
+        let timerInterval = null;
+        let shuffledQuestions = [];
+
+        // DOM elements
+        const levelSelection = document.getElementById('levelSelection');
+        const quizContainer = document.getElementById('quizContainer');
+        const resultsScreen = document.getElementById('resultsScreen');
+        const answerInput = document.getElementById('answerInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const feedback = document.getElementById('feedback');
+        const nextBtn = document.getElementById('nextBtn');
+
+        // Start quiz
+        function startQuiz(level) {
+            currentLevel = level;
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            bestStreak = 0;
+            correctCount = 0;
+            totalTime = 0;
+            questionTimes = [];
+
+            // Shuffle questions
+            shuffledQuestions = [...questions[level]].sort(() => Math.random() - 0.5);
+
+            levelSelection.style.display = 'none';
+            resultsScreen.classList.remove('active');
+            quizContainer.classList.add('active');
+
+            document.getElementById('totalQ').textContent = shuffledQuestions.length;
+            updateStats();
+            loadQuestion();
+        }
+
+        // Load question
+        function loadQuestion() {
+            const q = shuffledQuestions[currentQuestionIndex];
+            
+            document.getElementById('questionNumber').textContent = `Q${currentQuestionIndex + 1}`;
+            document.getElementById('questionText').textContent = q.question;
+            document.getElementById('questionHint').innerHTML = `💡 <strong>Indice :</strong> ${q.hint}`;
+            document.getElementById('questionPoints').textContent = `+${q.points} pts`;
+            document.getElementById('currentQ').textContent = currentQuestionIndex + 1;
+
+            // Set difficulty badge
+            const difficultyEl = document.getElementById('questionDifficulty');
+            const difficultyMap = {
+                beginner: { text: 'Facile', class: 'easy' },
+                intermediate: { text: 'Moyen', class: 'medium' },
+                advanced: { text: 'Difficile', class: 'hard' },
+                expert: { text: 'Expert', class: 'expert' }
+            };
+            difficultyEl.textContent = difficultyMap[currentLevel].text;
+            difficultyEl.className = `question-difficulty ${difficultyMap[currentLevel].class}`;
+
+            // Update progress bar
+            const progress = (currentQuestionIndex / shuffledQuestions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+
+            // Reset input and feedback
+            answerInput.value = '';
+            answerInput.className = 'answer-input';
+            answerInput.disabled = false;
+            submitBtn.disabled = false;
+            feedback.classList.remove('show', 'correct', 'incorrect');
+            answerInput.focus();
+
+            // Start timer
+            startTimer();
+        }
+
+        // Timer
+        function startTimer() {
+            clearInterval(timerInterval);
+            timer = currentLevel === 'expert' ? 20 : currentLevel === 'advanced' ? 25 : 30;
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                timer--;
+                updateTimerDisplay();
+
+                if (timer <= 10) {
+                    document.getElementById('timer').classList.add('timer-warning');
+                } else {
+                    document.getElementById('timer').classList.remove('timer-warning');
+                }
+
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    timeUp();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById('timer').textContent = timer;
+        }
+
+        function timeUp() {
+            answerInput.disabled = true;
+            submitBtn.disabled = true;
+            answerInput.className = 'answer-input incorrect';
+            
+            streak = 0;
+            updateStats();
+
+            const q = shuffledQuestions[currentQuestionIndex];
+            showFeedback(false, `⏱️ Temps écoulé ! La réponse était : <code>${q.answers[0]}</code><br><br>${q.explanation}`);
+        }
+
+        // Check answer
+        function checkAnswer() {
+            clearInterval(timerInterval);
+            const answer = answerInput.value.trim().toLowerCase();
+            const q = shuffledQuestions[currentQuestionIndex];
+            
+            const timeSpent = (currentLevel === 'expert' ? 20 : currentLevel === 'advanced' ? 25 : 30) - timer;
+            questionTimes.push(timeSpent);
+
+            // Check if answer is correct (allow some flexibility)
+            const isCorrect = q.answers.some(a => {
+                const normalizedAnswer = answer.replace(/\s+/g, ' ').trim();
+                const normalizedExpected = a.toLowerCase().replace(/\s+/g, ' ').trim();
+                return normalizedAnswer === normalizedExpected;
+            });
+
+            answerInput.disabled = true;
+            submitBtn.disabled = true;
+
+            if (isCorrect) {
+                // Correct answer
+                answerInput.className = 'answer-input correct';
+                
+                // Calculate points with time bonus
+                let points = q.points;
+                if (timer > 20) points += 5; // Speed bonus
+                if (streak >= 3) points += Math.floor(streak * 2); // Streak bonus
+                
+                score += points;
+                streak++;
+                correctCount++;
+                if (streak > bestStreak) bestStreak = streak;
+
+                showFeedback(true, `${q.explanation}<br><br>🎯 +${points} points ${timer > 20 ? '(bonus rapidité !)' : ''}`);
+            } else {
+                // Incorrect answer
+                answerInput.className = 'answer-input incorrect';
+                streak = 0;
+
+                showFeedback(false, `La bonne réponse était : <code>${q.answers[0]}</code><br><br>${q.explanation}`);
+            }
+
+            updateStats();
+        }
+
+        // Show feedback
+        function showFeedback(correct, text) {
+            feedback.className = `feedback show ${correct ? 'correct' : 'incorrect'}`;
+            document.getElementById('feedbackIcon').textContent = correct ? '✅' : '❌';
+            document.getElementById('feedbackTitle').textContent = correct ? 'Correct !' : 'Incorrect';
+            document.getElementById('feedbackText').innerHTML = text;
+
+            // Check if last question
+            if (currentQuestionIndex >= shuffledQuestions.length - 1) {
+                nextBtn.textContent = 'Voir les résultats →';
+            } else {
+                nextBtn.textContent = 'Question suivante →';
+            }
+        }
+
+        // Next question
+        function nextQuestion() {
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex >= shuffledQuestions.length) {
+                showResults();
+            } else {
+                loadQuestion();
+            }
+        }
+
+        // Update stats display
+        function updateStats() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('streak').textContent = streak;
+
+            const streakFire = document.getElementById('streakFire');
+            if (streak >= 3) {
+                streakFire.style.display = 'inline';
+            } else {
+                streakFire.style.display = 'none';
+            }
+        }
+
+        // Show results
+        function showResults() {
+            clearInterval(timerInterval);
+            quizContainer.classList.remove('active');
+            resultsScreen.classList.add('active');
+
+            const totalQuestions = shuffledQuestions.length;
+            const percentage = Math.round((correctCount / totalQuestions) * 100);
+            const avgTime = questionTimes.length > 0 ? Math.round(questionTimes.reduce((a, b) => a + b, 0) / questionTimes.length) : 0;
+
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('correctAnswers').textContent = `${correctCount}/${totalQuestions}`;
+            document.getElementById('bestStreak').textContent = bestStreak;
+            document.getElementById('avgTime').textContent = `${avgTime}s`;
+
+            // Grade
+            const gradeEl = document.getElementById('resultsGrade');
+            const iconEl = document.getElementById('resultsIcon');
+            const titleEl = document.getElementById('resultsTitle');
+            const subtitleEl = document.getElementById('resultsSubtitle');
+
+            if (percentage >= 90) {
+                gradeEl.className = 'results-grade excellent';
+                gradeEl.textContent = '🏆 Expert Linux !';
+                iconEl.textContent = '🏆';
+                titleEl.textContent = 'Incroyable !';
+                subtitleEl.textContent = 'Tu maîtrises Linux comme un pro !';
+            } else if (percentage >= 70) {
+                gradeEl.className = 'results-grade good';
+                gradeEl.textContent = '⭐ Très bien !';
+                iconEl.textContent = '🌟';
+                titleEl.textContent = 'Excellent travail !';
+                subtitleEl.textContent = 'Tu as de solides connaissances !';
+            } else if (percentage >= 50) {
+                gradeEl.className = 'results-grade average';
+                gradeEl.textContent = '👍 Pas mal !';
+                iconEl.textContent = '💪';
+                titleEl.textContent = 'Bien joué !';
+                subtitleEl.textContent = 'Continue à pratiquer !';
+            } else {
+                gradeEl.className = 'results-grade poor';
+                gradeEl.textContent = '📚 À réviser';
+                iconEl.textContent = '📖';
+                titleEl.textContent = 'Continue d\'apprendre !';
+                subtitleEl.textContent = 'La pratique rend parfait !';
+            }
+        }
+
+        // Restart quiz
+        function restartQuiz() {
+            startQuiz(currentLevel);
+        }
+
+        // Go home
+        function goHome() {
+            clearInterval(timerInterval);
+            quizContainer.classList.remove('active');
+            resultsScreen.classList.remove('active');
+            levelSelection.style.display = 'grid';
+        }
+
+        // Enter key to submit
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !submitBtn.disabled) {
+                checkAnswer();
+            }
+        });
+
+        // Enter key for next question when feedback is shown
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && feedback.classList.contains('show')) {
+                nextQuestion();
+            }
+        });
+    </script>
+</body>
+</html>

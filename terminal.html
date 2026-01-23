@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Terminal Simulator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-terminal: #0c0c14;
+            --bg-header: #1a1a24;
+            --text-primary: #e0e0e0;
+            --text-green: #4ade80;
+            --text-cyan: #22d3ee;
+            --text-yellow: #facc15;
+            --text-red: #f87171;
+            --text-purple: #c084fc;
+            --text-blue: #60a5fa;
+            --border-color: #2a2a3a;
+            --glow-green: rgba(74, 222, 128, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header h1 span {
+            color: var(--text-green);
+        }
+
+        .page-header p {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        /* Terminal Container */
+        .terminal-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--bg-terminal);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.5),
+                0 0 100px rgba(74, 222, 128, 0.1);
+        }
+
+        /* Terminal Header */
+        .terminal-header {
+            background: var(--bg-header);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #f87171; }
+        .dot-yellow { background: #facc15; }
+        .dot-green { background: #4ade80; }
+
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        /* Terminal Body */
+        .terminal-body {
+            padding: 1rem;
+            height: 500px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .terminal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .terminal-body::-webkit-scrollbar-track {
+            background: var(--bg-terminal);
+        }
+
+        .terminal-body::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        /* Output lines */
+        .output-line {
+            margin-bottom: 0.25rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .output-line.command {
+            color: var(--text-primary);
+        }
+
+        .output-line.result {
+            color: #aaa;
+        }
+
+        .output-line.error {
+            color: var(--text-red);
+        }
+
+        .output-line.success {
+            color: var(--text-green);
+        }
+
+        .output-line.info {
+            color: var(--text-cyan);
+        }
+
+        .output-line.warning {
+            color: var(--text-yellow);
+        }
+
+        /* Prompt */
+        .prompt {
+            color: var(--text-green);
+        }
+
+        .prompt-user {
+            color: var(--text-cyan);
+        }
+
+        .prompt-separator {
+            color: var(--text-primary);
+        }
+
+        .prompt-path {
+            color: var(--text-purple);
+        }
+
+        .prompt-symbol {
+            color: var(--text-green);
+        }
+
+        /* Input line */
+        .input-line {
+            display: flex;
+            align-items: center;
+        }
+
+        .input-line input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            caret-color: var(--text-green);
+        }
+
+        /* Welcome message */
+        .welcome-art {
+            color: var(--text-green);
+            margin-bottom: 1rem;
+        }
+
+        /* File listings */
+        .file-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .file-item {
+            min-width: 120px;
+        }
+
+        .file-item.directory {
+            color: var(--text-blue);
+            font-weight: bold;
+        }
+
+        .file-item.file {
+            color: var(--text-primary);
+        }
+
+        .file-item.executable {
+            color: var(--text-green);
+        }
+
+        .file-item.hidden {
+            color: #666;
+        }
+
+        /* Help styling */
+        .help-command {
+            color: var(--text-yellow);
+            display: inline-block;
+            min-width: 150px;
+        }
+
+        .help-desc {
+            color: #888;
+        }
+
+        /* Back link */
+        .back-link {
+            margin-top: 2rem;
+            color: var(--text-cyan);
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--text-green);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .terminal-body {
+                height: 400px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1>🐧 Linux <span>Terminal</span> Simulator</h1>
+        <p>Testez les commandes Linux de base dans votre navigateur</p>
+    </div>
+
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-dots">
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+            </div>
+            <div class="terminal-title">edem38@linux:~</div>
+        </div>
+        <div class="terminal-body" id="terminal">
+            <!-- Output will be inserted here -->
+        </div>
+    </div>
+
+    <a href="index.html" class="back-link">← Retour au portfolio</a>
+
+    <script>
+        // Virtual File System
+        const fileSystem = {
+            '/': {
+                type: 'dir',
+                children: ['home', 'etc', 'var', 'usr', 'tmp']
+            },
+            '/home': {
+                type: 'dir',
+                children: ['edem38']
+            },
+            '/home/edem38': {
+                type: 'dir',
+                children: ['projets', 'documents', 'scripts', '.bashrc', '.profile', 'README.md']
+            },
+            '/home/edem38/projets': {
+                type: 'dir',
+                children: ['sysmonitor', 'rts-medieval', 'portfolio']
+            },
+            '/home/edem38/projets/sysmonitor': {
+                type: 'dir',
+                children: ['index.html', 'collect_metrics.py', 'data.json', 'README.md']
+            },
+            '/home/edem38/projets/rts-medieval': {
+                type: 'dir',
+                children: ['index.html', 'game.js', 'style.css', 'assets']
+            },
+            '/home/edem38/projets/rts-medieval/assets': {
+                type: 'dir',
+                children: ['sprites', 'sounds']
+            },
+            '/home/edem38/projets/portfolio': {
+                type: 'dir',
+                children: ['index.html', 'linux.png', 'style.css']
+            },
+            '/home/edem38/documents': {
+                type: 'dir',
+                children: ['cv.pdf', 'notes.txt', 'todo.md']
+            },
+            '/home/edem38/scripts': {
+                type: 'dir',
+                children: ['backup.sh', 'deploy.sh', 'monitor.py']
+            },
+            '/etc': {
+                type: 'dir',
+                children: ['hosts', 'passwd', 'nginx', 'docker']
+            },
+            '/etc/nginx': {
+                type: 'dir',
+                children: ['nginx.conf', 'sites-available', 'sites-enabled']
+            },
+            '/etc/docker': {
+                type: 'dir',
+                children: ['daemon.json']
+            },
+            '/var': {
+                type: 'dir',
+                children: ['log', 'www']
+            },
+            '/var/log': {
+                type: 'dir',
+                children: ['syslog', 'auth.log', 'nginx']
+            },
+            '/var/www': {
+                type: 'dir',
+                children: ['html']
+            },
+            '/usr': {
+                type: 'dir',
+                children: ['bin', 'local', 'share']
+            },
+            '/tmp': {
+                type: 'dir',
+                children: ['cache', 'session_123']
+            },
+            // Files with content
+            '/home/edem38/README.md': {
+                type: 'file',
+                content: `# Bienvenue sur mon espace !
+
+Je suis edem38, ingénieur système Linux / DevOps.
+
+## Mes compétences
+- Linux (Ubuntu, Debian, RedHat)
+- Docker & Kubernetes
+- Ansible & Terraform
+- CI/CD (GitLab, GitHub Actions)
+- Python & Bash
+
+## Contact
+- GitHub: @edem38
+- Portfolio: edem38.github.io`
+            },
+            '/home/edem38/.bashrc': {
+                type: 'file',
+                content: `# ~/.bashrc
+export PATH=$PATH:/usr/local/bin
+export EDITOR=vim
+alias ll='ls -la'
+alias gs='git status'
+alias dc='docker-compose'
+alias k='kubectl'
+
+# Prompt
+PS1='\\[\\033[01;32m\\]\\u@\\h\\[\\033[00m\\]:\\[\\033[01;34m\\]\\w\\[\\033[00m\\]\\$ '`
+            },
+            '/home/edem38/.profile': {
+                type: 'file',
+                content: `# ~/.profile
+if [ -f ~/.bashrc ]; then
+    . ~/.bashrc
+fi
+
+export LANG=fr_FR.UTF-8`
+            },
+            '/home/edem38/documents/notes.txt': {
+                type: 'file',
+                content: `Notes du jour:
+- Finir le dashboard de monitoring
+- Mettre à jour le portfolio
+- Tester le déploiement Kubernetes
+- Revoir la config Ansible`
+            },
+            '/home/edem38/documents/todo.md': {
+                type: 'file',
+                content: `# Todo List
+
+## En cours
+- [x] Créer le portfolio
+- [x] Projet SysMonitor
+- [ ] Ajouter plus de projets
+
+## À faire
+- [ ] Apprendre Rust
+- [ ] Certif Kubernetes CKA
+- [ ] Contribuer à l'open source`
+            },
+            '/home/edem38/scripts/backup.sh': {
+                type: 'file',
+                executable: true,
+                content: `#!/bin/bash
+# Script de backup automatique
+
+DATE=$(date +%Y%m%d)
+BACKUP_DIR="/var/backups"
+
+echo "Démarrage du backup..."
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz /home/edem38/projets
+echo "Backup terminé !"`
+            },
+            '/home/edem38/scripts/deploy.sh': {
+                type: 'file',
+                executable: true,
+                content: `#!/bin/bash
+# Script de déploiement
+
+echo "🚀 Déploiement en cours..."
+git pull origin main
+docker-compose down
+docker-compose up -d --build
+echo "✅ Déploiement terminé !"`
+            },
+            '/home/edem38/scripts/monitor.py': {
+                type: 'file',
+                content: `#!/usr/bin/env python3
+import psutil
+import json
+
+def get_metrics():
+    return {
+        'cpu': psutil.cpu_percent(),
+        'memory': psutil.virtual_memory().percent,
+        'disk': psutil.disk_usage('/').percent
+    }
+
+if __name__ == '__main__':
+    print(json.dumps(get_metrics(), indent=2))`
+            },
+            '/home/edem38/projets/sysmonitor/README.md': {
+                type: 'file',
+                content: `# SysMonitor Dashboard
+
+Dashboard de monitoring système en temps réel.
+
+## Features
+- CPU, RAM, Disk monitoring
+- Network stats
+- Process list
+- Service status
+
+## Installation
+\`\`\`bash
+pip install psutil
+python3 collect_metrics.py --daemon
+\`\`\``
+            },
+            '/etc/hosts': {
+                type: 'file',
+                content: `127.0.0.1       localhost
+127.0.1.1       edem38-pc
+192.168.1.100   server-prod
+192.168.1.101   server-staging`
+            },
+            '/etc/passwd': {
+                type: 'file',
+                content: `root:x:0:0:root:/root:/bin/bash
+edem38:x:1000:1000:edem38,,,:/home/edem38:/bin/bash
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+docker:x:999:999::/home/docker:/bin/false`
+            }
+        };
+
+        // State
+        let currentPath = '/home/edem38';
+        let commandHistory = [];
+        let historyIndex = -1;
+        const terminal = document.getElementById('terminal');
+
+        // Helper functions
+        function resolvePath(path) {
+            if (path.startsWith('/')) {
+                return normalizePath(path);
+            }
+            if (path === '~') {
+                return '/home/edem38';
+            }
+            if (path.startsWith('~/')) {
+                return normalizePath('/home/edem38/' + path.slice(2));
+            }
+            return normalizePath(currentPath + '/' + path);
+        }
+
+        function normalizePath(path) {
+            const parts = path.split('/').filter(p => p !== '' && p !== '.');
+            const result = [];
+            for (const part of parts) {
+                if (part === '..') {
+                    result.pop();
+                } else {
+                    result.push(part);
+                }
+            }
+            return '/' + result.join('/');
+        }
+
+        function getPrompt() {
+            const displayPath = currentPath === '/home/edem38' ? '~' : 
+                               currentPath.startsWith('/home/edem38/') ? '~' + currentPath.slice(12) : 
+                               currentPath;
+            return `<span class="prompt-user">edem38</span><span class="prompt-separator">@</span><span class="prompt-user">linux</span><span class="prompt-separator">:</span><span class="prompt-path">${displayPath}</span><span class="prompt-symbol">$</span> `;
+        }
+
+        function addOutput(html, className = '') {
+            const line = document.createElement('div');
+            line.className = 'output-line ' + className;
+            line.innerHTML = html;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function isDirectory(path) {
+            return fileSystem[path] && fileSystem[path].type === 'dir';
+        }
+
+        function isFile(path) {
+            return fileSystem[path] && fileSystem[path].type === 'file';
+        }
+
+        function exists(path) {
+            if (fileSystem[path]) return true;
+            // Check if it's a file in a directory
+            const parent = path.substring(0, path.lastIndexOf('/')) || '/';
+            const name = path.substring(path.lastIndexOf('/') + 1);
+            if (fileSystem[parent] && fileSystem[parent].children) {
+                return fileSystem[parent].children.includes(name);
+            }
+            return false;
+        }
+
+        // Commands
+        const commands = {
+            help: () => {
+                addOutput(`
+<span style="color: var(--text-cyan)">═══════════════════════════════════════════════════════════════</span>
+<span style="color: var(--text-green)">                    COMMANDES DISPONIBLES</span>
+<span style="color: var(--text-cyan)">═══════════════════════════════════════════════════════════════</span>
+
+<span style="color: var(--text-yellow)">📁 NAVIGATION & FICHIERS</span>
+<span class="help-command">ls [-la] [path]</span> <span class="help-desc">Liste les fichiers et dossiers</span>
+<span class="help-command">cd [path]</span> <span class="help-desc">Change de répertoire (cd, cd ~, cd ..)</span>
+<span class="help-command">pwd</span> <span class="help-desc">Affiche le répertoire courant</span>
+<span class="help-command">tree [path]</span> <span class="help-desc">Affiche l'arborescence</span>
+
+<span style="color: var(--text-yellow)">📄 LECTURE DE FICHIERS</span>
+<span class="help-command">cat [file]</span> <span class="help-desc">Affiche le contenu d'un fichier</span>
+<span class="help-command">head [file]</span> <span class="help-desc">Affiche les 10 premières lignes</span>
+<span class="help-command">tail [file]</span> <span class="help-desc">Affiche les 10 dernières lignes</span>
+<span class="help-command">wc [file]</span> <span class="help-desc">Compte lignes, mots et caractères</span>
+
+<span style="color: var(--text-yellow)">✏️ CRÉATION & MODIFICATION</span>
+<span class="help-command">touch [file]</span> <span class="help-desc">Crée un fichier vide</span>
+<span class="help-command">mkdir [-p] [dir]</span> <span class="help-desc">Crée un répertoire</span>
+<span class="help-command">cp [-r] [src] [dest]</span> <span class="help-desc">Copie un fichier ou dossier</span>
+<span class="help-command">mv [src] [dest]</span> <span class="help-desc">Déplace ou renomme</span>
+<span class="help-command">rm [-rf] [file]</span> <span class="help-desc">Supprime un fichier ou dossier</span>
+<span class="help-command">rmdir [dir]</span> <span class="help-desc">Supprime un dossier vide</span>
+
+<span style="color: var(--text-yellow)">🔍 RECHERCHE</span>
+<span class="help-command">grep [pattern] [file]</span> <span class="help-desc">Recherche dans un fichier</span>
+<span class="help-command">find [path] -name [pattern]</span> <span class="help-desc">Recherche des fichiers</span>
+
+<span style="color: var(--text-yellow)">📊 INFOS FICHIERS</span>
+<span class="help-command">stat [file]</span> <span class="help-desc">Infos détaillées d'un fichier</span>
+<span class="help-command">file [file]</span> <span class="help-desc">Type de fichier</span>
+<span class="help-command">basename [path]</span> <span class="help-desc">Nom du fichier</span>
+<span class="help-command">dirname [path]</span> <span class="help-desc">Chemin du dossier</span>
+<span class="help-command">realpath [path]</span> <span class="help-desc">Chemin absolu</span>
+
+<span style="color: var(--text-yellow)">💻 SYSTÈME</span>
+<span class="help-command">whoami</span> <span class="help-desc">Utilisateur courant</span>
+<span class="help-command">hostname</span> <span class="help-desc">Nom de la machine</span>
+<span class="help-command">uname -a</span> <span class="help-desc">Informations système</span>
+<span class="help-command">uptime</span> <span class="help-desc">Temps de fonctionnement</span>
+<span class="help-command">date</span> <span class="help-desc">Date et heure</span>
+<span class="help-command">echo [text]</span> <span class="help-desc">Affiche du texte</span>
+<span class="help-command">neofetch</span> <span class="help-desc">Infos système stylisées</span>
+
+<span style="color: var(--text-yellow)">🐳 DEVOPS</span>
+<span class="help-command">docker ps</span> <span class="help-desc">Liste des containers</span>
+<span class="help-command">docker images</span> <span class="help-desc">Liste des images</span>
+<span class="help-command">kubectl get pods</span> <span class="help-desc">Liste des pods K8s</span>
+<span class="help-command">kubectl get nodes</span> <span class="help-desc">Liste des nodes K8s</span>
+<span class="help-command">git status</span> <span class="help-desc">Statut du repo</span>
+<span class="help-command">git log</span> <span class="help-desc">Historique des commits</span>
+
+<span style="color: var(--text-yellow)">🔧 TERMINAL</span>
+<span class="help-command">clear</span> <span class="help-desc">Efface l'écran (ou Ctrl+L)</span>
+<span class="help-command">history</span> <span class="help-desc">Historique des commandes</span>
+<span class="help-command">exit</span> <span class="help-desc">Quitte le terminal</span>
+
+<span style="color: var(--text-cyan)">═══════════════════════════════════════════════════════════════</span>
+<span style="color: var(--text-purple)">💡 Astuce: Utilisez ↑↓ pour naviguer dans l'historique</span>
+<span style="color: var(--text-purple)">💡 Astuce: Utilisez Tab pour l'autocomplétion</span>
+<span style="color: var(--text-cyan)">═══════════════════════════════════════════════════════════════</span>
+`, 'result');
+            },
+
+            ls: (args) => {
+                let showAll = false;
+                let showLong = false;
+                let targetPath = currentPath;
+
+                args.forEach(arg => {
+                    if (arg === '-a') showAll = true;
+                    else if (arg === '-l') showLong = true;
+                    else if (arg === '-la' || arg === '-al') { showAll = true; showLong = true; }
+                    else if (!arg.startsWith('-')) targetPath = resolvePath(arg);
+                });
+
+                if (!isDirectory(targetPath)) {
+                    addOutput(`ls: impossible d'accéder à '${args[args.length-1] || targetPath}': Aucun fichier ou dossier de ce type`, 'error');
+                    return;
+                }
+
+                let items = fileSystem[targetPath].children || [];
+                if (!showAll) {
+                    items = items.filter(i => !i.startsWith('.'));
+                }
+
+                if (showLong) {
+                    if (showAll) {
+                        addOutput('drwxr-xr-x  2 edem38 edem38 4096 Jan 23 14:00 <span style="color: var(--text-blue); font-weight: bold;">.</span>', 'result');
+                        addOutput('drwxr-xr-x  2 edem38 edem38 4096 Jan 23 14:00 <span style="color: var(--text-blue); font-weight: bold;">..</span>', 'result');
+                    }
+                    items.forEach(item => {
+                        const fullPath = targetPath === '/' ? '/' + item : targetPath + '/' + item;
+                        const isDir = isDirectory(fullPath);
+                        const isExec = fileSystem[fullPath]?.executable;
+                        const perms = isDir ? 'drwxr-xr-x' : (isExec ? '-rwxr-xr-x' : '-rw-r--r--');
+                        const size = isDir ? '4096' : '1234';
+                        let colorClass = isDir ? 'color: var(--text-blue); font-weight: bold;' : 
+                                        isExec ? 'color: var(--text-green);' :
+                                        item.startsWith('.') ? 'color: #666;' : '';
+                        addOutput(`${perms}  1 edem38 edem38 ${size.padStart(5)} Jan 23 14:00 <span style="${colorClass}">${item}</span>`, 'result');
+                    });
+                } else {
+                    let output = '<div class="file-list">';
+                    items.forEach(item => {
+                        const fullPath = targetPath === '/' ? '/' + item : targetPath + '/' + item;
+                        const isDir = isDirectory(fullPath);
+                        const isExec = fileSystem[fullPath]?.executable;
+                        let className = isDir ? 'directory' : (isExec ? 'executable' : 'file');
+                        if (item.startsWith('.')) className += ' hidden';
+                        output += `<span class="file-item ${className}">${item}${isDir ? '/' : ''}</span>`;
+                    });
+                    output += '</div>';
+                    addOutput(output, 'result');
+                }
+            },
+
+            cd: (args) => {
+                const target = args[0] || '/home/edem38';
+                const newPath = resolvePath(target);
+
+                if (newPath === '') {
+                    currentPath = '/';
+                    return;
+                }
+
+                if (isDirectory(newPath)) {
+                    currentPath = newPath;
+                } else if (exists(newPath)) {
+                    addOutput(`cd: ${target}: N'est pas un répertoire`, 'error');
+                } else {
+                    addOutput(`cd: ${target}: Aucun fichier ou dossier de ce type`, 'error');
+                }
+            },
+
+            pwd: () => {
+                addOutput(currentPath, 'result');
+            },
+
+            cat: (args) => {
+                if (args.length === 0) {
+                    addOutput('cat: opérande manquant', 'error');
+                    return;
+                }
+                const filePath = resolvePath(args[0]);
+                if (isFile(filePath)) {
+                    addOutput(fileSystem[filePath].content.replace(/</g, '&lt;').replace(/>/g, '&gt;'), 'result');
+                } else if (isDirectory(filePath)) {
+                    addOutput(`cat: ${args[0]}: Est un répertoire`, 'error');
+                } else {
+                    addOutput(`cat: ${args[0]}: Aucun fichier ou dossier de ce type`, 'error');
+                }
+            },
+
+            echo: (args) => {
+                addOutput(args.join(' '), 'result');
+            },
+
+            whoami: () => {
+                addOutput('edem38', 'result');
+            },
+
+            date: () => {
+                const now = new Date();
+                const options = { 
+                    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short'
+                };
+                addOutput(now.toLocaleString('fr-FR', options), 'result');
+            },
+
+            uname: (args) => {
+                if (args.includes('-a')) {
+                    addOutput('Linux edem38-pc 5.15.0-91-generic #101-Ubuntu SMP x86_64 GNU/Linux', 'result');
+                } else {
+                    addOutput('Linux', 'result');
+                }
+            },
+
+            hostname: () => {
+                addOutput('edem38-pc', 'result');
+            },
+
+            uptime: () => {
+                addOutput(' 14:32:15 up 47 days, 12:35,  1 user,  load average: 0.52, 0.48, 0.45', 'result');
+            },
+
+            clear: () => {
+                terminal.innerHTML = '';
+            },
+
+            history: () => {
+                commandHistory.forEach((cmd, i) => {
+                    addOutput(`  ${(i + 1).toString().padStart(3)}  ${cmd}`, 'result');
+                });
+            },
+
+            touch: (args) => {
+                if (args.length === 0) {
+                    addOutput('touch: opérande manquant', 'error');
+                    return;
+                }
+                const fileName = args[0];
+                const filePath = resolvePath(fileName);
+                const parentPath = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
+                const baseName = filePath.substring(filePath.lastIndexOf('/') + 1);
+                
+                // Check if parent directory exists
+                if (!isDirectory(parentPath)) {
+                    addOutput(`touch: impossible de créer '${fileName}': Aucun fichier ou dossier de ce type`, 'error');
+                    return;
+                }
+                
+                // Check if file already exists
+                if (fileSystem[filePath]) {
+                    // touch on existing file just updates timestamp, no message needed
+                    return;
+                }
+                
+                // Create the file
+                fileSystem[filePath] = {
+                    type: 'file',
+                    content: ''
+                };
+                
+                // Add to parent's children
+                if (!fileSystem[parentPath].children.includes(baseName)) {
+                    fileSystem[parentPath].children.push(baseName);
+                }
+                
+                addOutput(`Fichier '${baseName}' créé`, 'success');
+            },
+
+            mkdir: (args) => {
+                if (args.length === 0) {
+                    addOutput('mkdir: opérande manquant', 'error');
+                    return;
+                }
+                
+                const createParents = args.includes('-p');
+                const dirName = args.find(a => !a.startsWith('-'));
+                
+                if (!dirName) {
+                    addOutput('mkdir: opérande manquant', 'error');
+                    return;
+                }
+                
+                const dirPath = resolvePath(dirName);
+                const parentPath = dirPath.substring(0, dirPath.lastIndexOf('/')) || '/';
+                const baseName = dirPath.substring(dirPath.lastIndexOf('/') + 1);
+                
+                // Check if already exists
+                if (fileSystem[dirPath]) {
+                    addOutput(`mkdir: impossible de créer le répertoire '${dirName}': Le fichier existe`, 'error');
+                    return;
+                }
+                
+                // Check if parent directory exists
+                if (!isDirectory(parentPath)) {
+                    if (createParents) {
+                        // Create parent directories recursively (simplified)
+                        addOutput(`mkdir: création des répertoires parents non implémentée`, 'warning');
+                        return;
+                    }
+                    addOutput(`mkdir: impossible de créer le répertoire '${dirName}': Aucun fichier ou dossier de ce type`, 'error');
+                    return;
+                }
+                
+                // Create the directory
+                fileSystem[dirPath] = {
+                    type: 'dir',
+                    children: []
+                };
+                
+                // Add to parent's children
+                if (!fileSystem[parentPath].children.includes(baseName)) {
+                    fileSystem[parentPath].children.push(baseName);
+                }
+                
+                addOutput(`Répertoire '${baseName}' créé`, 'success');
+            },
+
+            rm: (args) => {
+                if (args.length === 0) {
+                    addOutput('rm: opérande manquant', 'error');
+                    return;
+                }
+                
+                const recursive = args.includes('-r') || args.includes('-rf') || args.includes('-fr');
+                const force = args.includes('-f') || args.includes('-rf') || args.includes('-fr');
+                const target = args.find(a => !a.startsWith('-'));
+                
+                if (!target) {
+                    addOutput('rm: opérande manquant', 'error');
+                    return;
+                }
+                
+                // Easter egg for rm -rf /
+                if ((target === '/' || target === '/*') && recursive) {
+                    addOutput(`rm: il est dangereux d'opérer récursivement sur '/'`, 'error');
+                    addOutput(`rm: utilisez --no-preserve-root pour passer outre cette sécurité`, 'error');
+                    addOutput(`😈 Nice try! Mais ce terminal est protégé.`, 'warning');
+                    return;
+                }
+                
+                const filePath = resolvePath(target);
+                const parentPath = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
+                const baseName = filePath.substring(filePath.lastIndexOf('/') + 1);
+                
+                // Check if file/dir exists
+                if (!fileSystem[filePath] && !fileSystem[parentPath]?.children?.includes(baseName)) {
+                    if (!force) {
+                        addOutput(`rm: impossible de supprimer '${target}': Aucun fichier ou dossier de ce type`, 'error');
+                    }
+                    return;
+                }
+                
+                // Check if it's a directory
+                if (isDirectory(filePath)) {
+                    if (!recursive) {
+                        addOutput(`rm: impossible de supprimer '${target}': est un dossier`, 'error');
+                        addOutput(`Utilisez 'rm -r ${target}' pour supprimer un dossier`, 'info');
+                        return;
+                    }
+                    // Remove directory and all contents
+                    Object.keys(fileSystem).forEach(path => {
+                        if (path.startsWith(filePath)) {
+                            delete fileSystem[path];
+                        }
+                    });
+                }
+                
+                // Remove from filesystem
+                delete fileSystem[filePath];
+                
+                // Remove from parent's children
+                if (fileSystem[parentPath] && fileSystem[parentPath].children) {
+                    const index = fileSystem[parentPath].children.indexOf(baseName);
+                    if (index > -1) {
+                        fileSystem[parentPath].children.splice(index, 1);
+                    }
+                }
+                
+                addOutput(`'${baseName}' supprimé`, 'success');
+            },
+
+            cp: (args) => {
+                if (args.length < 2) {
+                    addOutput('cp: opérandes manquants', 'error');
+                    return;
+                }
+                
+                const recursive = args.includes('-r');
+                const filteredArgs = args.filter(a => !a.startsWith('-'));
+                
+                if (filteredArgs.length < 2) {
+                    addOutput('cp: opérandes manquants', 'error');
+                    return;
+                }
+                
+                const srcPath = resolvePath(filteredArgs[0]);
+                const destArg = filteredArgs[1];
+                let destPath = resolvePath(destArg);
+                
+                // Check if source exists
+                if (!fileSystem[srcPath]) {
+                    addOutput(`cp: impossible d'évaluer '${filteredArgs[0]}': Aucun fichier ou dossier de ce type`, 'error');
+                    return;
+                }
+                
+                // If source is directory and no -r flag
+                if (isDirectory(srcPath) && !recursive) {
+                    addOutput(`cp: -r non spécifié; omission du répertoire '${filteredArgs[0]}'`, 'error');
+                    return;
+                }
+                
+                // If destination is existing directory, copy into it
+                if (isDirectory(destPath)) {
+                    const srcName = srcPath.substring(srcPath.lastIndexOf('/') + 1);
+                    destPath = destPath + '/' + srcName;
+                }
+                
+                const destParent = destPath.substring(0, destPath.lastIndexOf('/')) || '/';
+                const destName = destPath.substring(destPath.lastIndexOf('/') + 1);
+                
+                // Check if destination parent exists
+                if (!isDirectory(destParent)) {
+                    addOutput(`cp: impossible de créer '${destArg}': Aucun fichier ou dossier de ce type`, 'error');
+                    return;
+                }
+                
+                // Copy file
+                if (isFile(srcPath)) {
+                    fileSystem[destPath] = {
+                        type: 'file',
+                        content: fileSystem[srcPath].content,
+                        executable: fileSystem[srcPath].executable
+                    };
+                } else {
+                    // Copy directory (simplified - just creates empty dir)
+                    fileSystem[destPath] = {
+                        type: 'dir',
+                        children: [...fileSystem[srcPath].children]
+                    };
+                }
+                
+                // Add to parent's children
+                if (!fileSystem[destParent].children.includes(destName)) {
+                    fileSystem[destParent].children.push(destName);
+                }
+                
+                addOutput(`'${filteredArgs[0]}' copié vers '${destArg}'`, 'success');
+            },
+
+            mv: (args) => {
+                if (args.length < 2) {
+                    addOutput('mv: opérandes manquants', 'error');
+                    return;
+                }
+                
+                const srcPath = resolvePath(args[0]);
+                const destArg = args[1];
+                let destPath = resolvePath(destArg);
+                
+                // Check if source exists
+                if (!fileSystem[srcPath]) {
+                    const srcParent = srcPath.substring(0, srcPath.lastIndexOf('/')) || '/';
+                    const srcName = srcPath.substring(srcPath.lastIndexOf('/') + 1);
+                    if (!fileSystem[srcParent]?.children?.includes(srcName)) {
+                        addOutput(`mv: impossible d'évaluer '${args[0]}': Aucun fichier ou dossier de ce type`, 'error');
+                        return;
+                    }
+                }
+                
+                // If destination is existing directory, move into it
+                if (isDirectory(destPath)) {
+                    const srcName = srcPath.substring(srcPath.lastIndexOf('/') + 1);
+                    destPath = destPath + '/' + srcName;
+                }
+                
+                const srcParent = srcPath.substring(0, srcPath.lastIndexOf('/')) || '/';
+                const srcName = srcPath.substring(srcPath.lastIndexOf('/') + 1);
+                const destParent = destPath.substring(0, destPath.lastIndexOf('/')) || '/';
+                const destName = destPath.substring(destPath.lastIndexOf('/') + 1);
+                
+                // Check if destination parent exists
+                if (!isDirectory(destParent)) {
+                    addOutput(`mv: impossible de déplacer '${args[0]}' vers '${destArg}': Aucun fichier ou dossier de ce type`, 'error');
+                    return;
+                }
+                
+                // Move the file/directory
+                fileSystem[destPath] = fileSystem[srcPath];
+                delete fileSystem[srcPath];
+                
+                // Update parent's children
+                if (fileSystem[srcParent] && fileSystem[srcParent].children) {
+                    const index = fileSystem[srcParent].children.indexOf(srcName);
+                    if (index > -1) {
+                        fileSystem[srcParent].children.splice(index, 1);
+                    }
+                }
+                
+                if (!fileSystem[destParent].children.includes(destName)) {
+                    fileSystem[destParent].children.push(destName);
+                }
+                
+                addOutput(`'${args[0]}' déplacé vers '${destArg}'`, 'success');
+            },
+
+            rmdir: (args) => {
+                if (args.length === 0) {
+                    addOutput('rmdir: opérande manquant', 'error');
+                    return;
+                }
+                
+                const dirPath = resolvePath(args[0]);
+                const parentPath = dirPath.substring(0, dirPath.lastIndexOf('/')) || '/';
+                const baseName = dirPath.substring(dirPath.lastIndexOf('/') + 1);
+                
+                if (!isDirectory(dirPath)) {
+                    addOutput(`rmdir: impossible de supprimer '${args[0]}': N'est pas un dossier`, 'error');
+                    return;
+                }
+                
+                if (fileSystem[dirPath].children && fileSystem[dirPath].children.length > 0) {
+                    addOutput(`rmdir: impossible de supprimer '${args[0]}': Le dossier n'est pas vide`, 'error');
+                    return;
+                }
+                
+                delete fileSystem[dirPath];
+                
+                if (fileSystem[parentPath] && fileSystem[parentPath].children) {
+                    const index = fileSystem[parentPath].children.indexOf(baseName);
+                    if (index > -1) {
+                        fileSystem[parentPath].children.splice(index, 1);
+                    }
+                }
+                
+                addOutput(`Répertoire '${baseName}' supprimé`, 'success');
+            },
+
+            cat_write: (args, content) => {
+                // Helper for echo > file
+                const filePath = resolvePath(args[0]);
+                const parentPath = filePath.substring(0, filePath.lastIndexOf('/')) || '/';
+                const baseName = filePath.substring(filePath.lastIndexOf('/') + 1);
+                
+                if (!isDirectory(parentPath)) {
+                    return false;
+                }
+                
+                fileSystem[filePath] = {
+                    type: 'file',
+                    content: content
+                };
+                
+                if (!fileSystem[parentPath].children.includes(baseName)) {
+                    fileSystem[parentPath].children.push(baseName);
+                }
+                return true;
+            },
+
+            basename: (args) => {
+                if (args.length === 0) {
+                    addOutput('basename: opérande manquant', 'error');
+                    return;
+                }
+                const path = args[0];
+                const name = path.substring(path.lastIndexOf('/') + 1);
+                addOutput(name, 'result');
+            },
+
+            dirname: (args) => {
+                if (args.length === 0) {
+                    addOutput('dirname: opérande manquant', 'error');
+                    return;
+                }
+                const path = args[0];
+                const dir = path.substring(0, path.lastIndexOf('/')) || '/';
+                addOutput(dir, 'result');
+            },
+
+            realpath: (args) => {
+                if (args.length === 0) {
+                    addOutput('realpath: opérande manquant', 'error');
+                    return;
+                }
+                const resolved = resolvePath(args[0]);
+                addOutput(resolved, 'result');
+            },
+
+            stat: (args) => {
+                if (args.length === 0) {
+                    addOutput('stat: opérande manquant', 'error');
+                    return;
+                }
+                const filePath = resolvePath(args[0]);
+                if (!fileSystem[filePath]) {
+                    addOutput(`stat: impossible d'évaluer '${args[0]}': Aucun fichier ou dossier de ce type`, 'error');
+                    return;
+                }
+                
+                const isDir = isDirectory(filePath);
+                const size = isDir ? 4096 : (fileSystem[filePath].content?.length || 0);
+                
+                addOutput(`  Fichier : ${args[0]}
+   Taille : ${size}        Blocs : ${Math.ceil(size/512)*8}          ${isDir ? 'répertoire' : 'fichier régulier'}
+Accès : ${isDir ? 'drwxr-xr-x' : '-rw-r--r--'}  Uid : ( 1000/  edem38)   Gid : ( 1000/  edem38)
+Accès : 2025-01-23 14:00:00.000000000 +0100
+Modif.: 2025-01-23 14:00:00.000000000 +0100
+Changt: 2025-01-23 14:00:00.000000000 +0100`, 'result');
+            },
+
+            file: (args) => {
+                if (args.length === 0) {
+                    addOutput('file: opérande manquant', 'error');
+                    return;
+                }
+                const filePath = resolvePath(args[0]);
+                if (!fileSystem[filePath]) {
+                    addOutput(`${args[0]}: cannot open (No such file or directory)`, 'error');
+                    return;
+                }
+                
+                if (isDirectory(filePath)) {
+                    addOutput(`${args[0]}: directory`, 'result');
+                } else if (fileSystem[filePath].executable) {
+                    addOutput(`${args[0]}: Bourne-Again shell script, ASCII text executable`, 'result');
+                } else if (args[0].endsWith('.py')) {
+                    addOutput(`${args[0]}: Python script, ASCII text executable`, 'result');
+                } else if (args[0].endsWith('.md')) {
+                    addOutput(`${args[0]}: UTF-8 Unicode text`, 'result');
+                } else if (args[0].endsWith('.html')) {
+                    addOutput(`${args[0]}: HTML document, ASCII text`, 'result');
+                } else if (args[0].endsWith('.json')) {
+                    addOutput(`${args[0]}: JSON data`, 'result');
+                } else {
+                    addOutput(`${args[0]}: ASCII text`, 'result');
+                }
+            },
+
+            head: (args) => {
+                if (args.length === 0) {
+                    addOutput('head: opérande manquant', 'error');
+                    return;
+                }
+                const filePath = resolvePath(args[0]);
+                if (isFile(filePath)) {
+                    const lines = fileSystem[filePath].content.split('\n').slice(0, 10);
+                    addOutput(lines.join('\n').replace(/</g, '&lt;').replace(/>/g, '&gt;'), 'result');
+                } else {
+                    addOutput(`head: ${args[0]}: Aucun fichier ou dossier de ce type`, 'error');
+                }
+            },
+
+            tail: (args) => {
+                if (args.length === 0) {
+                    addOutput('tail: opérande manquant', 'error');
+                    return;
+                }
+                const filePath = resolvePath(args[0]);
+                if (isFile(filePath)) {
+                    const lines = fileSystem[filePath].content.split('\n').slice(-10);
+                    addOutput(lines.join('\n').replace(/</g, '&lt;').replace(/>/g, '&gt;'), 'result');
+                } else {
+                    addOutput(`tail: ${args[0]}: Aucun fichier ou dossier de ce type`, 'error');
+                }
+            },
+
+            wc: (args) => {
+                if (args.length === 0) {
+                    addOutput('wc: opérande manquant', 'error');
+                    return;
+                }
+                const filePath = resolvePath(args[0]);
+                if (isFile(filePath)) {
+                    const content = fileSystem[filePath].content;
+                    const lines = content.split('\n').length;
+                    const words = content.split(/\s+/).filter(w => w).length;
+                    const chars = content.length;
+                    addOutput(`  ${lines}   ${words}  ${chars} ${args[0]}`, 'result');
+                } else {
+                    addOutput(`wc: ${args[0]}: Aucun fichier ou dossier de ce type`, 'error');
+                }
+            },
+
+            grep: (args) => {
+                if (args.length < 2) {
+                    addOutput('Usage: grep [pattern] [fichier]', 'error');
+                    return;
+                }
+                const pattern = args[0];
+                const filePath = resolvePath(args[1]);
+                if (isFile(filePath)) {
+                    const lines = fileSystem[filePath].content.split('\n');
+                    const matches = lines.filter(line => line.toLowerCase().includes(pattern.toLowerCase()));
+                    if (matches.length > 0) {
+                        matches.forEach(match => {
+                            const highlighted = match.replace(new RegExp(pattern, 'gi'), `<span style="color: var(--text-red); font-weight: bold;">$&</span>`);
+                            addOutput(highlighted, 'result');
+                        });
+                    }
+                } else {
+                    addOutput(`grep: ${args[1]}: Aucun fichier ou dossier de ce type`, 'error');
+                }
+            },
+
+            find: (args) => {
+                if (args.length < 3 || args[1] !== '-name') {
+                    addOutput('Usage: find [path] -name [pattern]', 'info');
+                    return;
+                }
+                const searchPath = resolvePath(args[0]);
+                const pattern = args[2].replace(/\*/g, '.*');
+                const regex = new RegExp(pattern, 'i');
+                
+                Object.keys(fileSystem).forEach(path => {
+                    if (path.startsWith(searchPath)) {
+                        const name = path.substring(path.lastIndexOf('/') + 1);
+                        if (regex.test(name)) {
+                            addOutput(path, 'result');
+                        }
+                    }
+                });
+            },
+
+            tree: (args) => {
+                const targetPath = args[0] ? resolvePath(args[0]) : currentPath;
+                
+                function printTree(path, prefix = '') {
+                    if (!isDirectory(path)) return;
+                    const items = fileSystem[path].children || [];
+                    items.forEach((item, index) => {
+                        const isLast = index === items.length - 1;
+                        const connector = isLast ? '└── ' : '├── ';
+                        const fullPath = path === '/' ? '/' + item : path + '/' + item;
+                        const isDir = isDirectory(fullPath);
+                        const color = isDir ? 'var(--text-blue)' : 'var(--text-primary)';
+                        addOutput(`${prefix}${connector}<span style="color: ${color}">${item}</span>`, 'result');
+                        if (isDir) {
+                            const newPrefix = prefix + (isLast ? '    ' : '│   ');
+                            printTree(fullPath, newPrefix);
+                        }
+                    });
+                }
+
+                const dirName = targetPath.substring(targetPath.lastIndexOf('/') + 1) || '/';
+                addOutput(`<span style="color: var(--text-blue)">${dirName}</span>`, 'result');
+                printTree(targetPath);
+            },
+
+            neofetch: () => {
+                addOutput(`
+<span style="color: var(--text-green)">        _nnnn_</span>          <span style="color: var(--text-cyan)">edem38</span>@<span style="color: var(--text-cyan)">linux</span>
+<span style="color: var(--text-green)">       dGGGGMMb</span>         ──────────────
+<span style="color: var(--text-green)">      @p~qp~~qMb</span>        <span style="color: var(--text-yellow)">OS:</span> Ubuntu 22.04 LTS
+<span style="color: var(--text-green)">      M|@||@) M|</span>        <span style="color: var(--text-yellow)">Host:</span> edem38-pc
+<span style="color: var(--text-green)">      @,----.JM|</span>        <span style="color: var(--text-yellow)">Kernel:</span> 5.15.0-91-generic
+<span style="color: var(--text-green)">     JS^\\__/  qKL</span>       <span style="color: var(--text-yellow)">Uptime:</span> 47 days, 12 hours
+<span style="color: var(--text-green)">    dZP        qKRb</span>      <span style="color: var(--text-yellow)">Shell:</span> bash 5.1.16
+<span style="color: var(--text-green)">   dZP          qKKb</span>     <span style="color: var(--text-yellow)">Terminal:</span> web-terminal
+<span style="color: var(--text-green)">  fZP            SMMb</span>    <span style="color: var(--text-yellow)">CPU:</span> Intel i7-12700K @ 3.6GHz
+<span style="color: var(--text-green)">  HZM            MMMM</span>    <span style="color: var(--text-yellow)">Memory:</span> 8192MB / 32768MB
+<span style="color: var(--text-green)">  FqM            MMMM</span>    <span style="color: var(--text-yellow)">Disk:</span> 256GB / 1TB
+<span style="color: var(--text-green)">__| ".        |\\dS"qML</span>
+<span style="color: var(--text-green)">|    \`.       | \`' \\Zq</span>   <span style="color: #f87171">███</span><span style="color: #fb923c">███</span><span style="color: #facc15">███</span><span style="color: #4ade80">███</span><span style="color: #22d3ee">███</span><span style="color: #60a5fa">███</span><span style="color: #c084fc">███</span>
+<span style="color: var(--text-green)">_)      \\.___.,|     .'</span>
+<span style="color: var(--text-green)">\\____   )MMMMMP|   .'</span>
+<span style="color: var(--text-green)">     \`-'       \`--'</span>
+`, 'result');
+            },
+
+            man: (args) => {
+                if (args.length === 0) {
+                    addOutput('Quel manuel voulez-vous ?', 'info');
+                    return;
+                }
+                addOutput(`Tapez 'help' pour voir les commandes disponibles.`, 'info');
+            },
+
+            exit: () => {
+                addOutput('À bientôt ! 👋', 'success');
+                addOutput('(Rechargez la page pour redémarrer le terminal)', 'info');
+            },
+
+            sudo: (args) => {
+                if (args.length === 0) {
+                    addOutput('usage: sudo commande', 'error');
+                    return;
+                }
+                addOutput('edem38 is not in the sudoers file. This incident will be reported. 😄', 'warning');
+            },
+
+            vim: (args) => {
+                addOutput('vim: commande interactive non supportée dans ce terminal', 'info');
+                addOutput('Utilisez "cat" pour lire les fichiers', 'info');
+            },
+
+            nano: (args) => {
+                addOutput('nano: commande interactive non supportée dans ce terminal', 'info');
+                addOutput('Utilisez "cat" pour lire les fichiers', 'info');
+            },
+
+            docker: (args) => {
+                if (args[0] === 'ps') {
+                    addOutput(`CONTAINER ID   IMAGE          STATUS          NAMES
+a1b2c3d4e5f6   nginx:latest   Up 47 days      web-server
+b2c3d4e5f6a1   postgres:14    Up 47 days      database
+c3d4e5f6a1b2   redis:alpine   Up 47 days      cache`, 'result');
+                } else if (args[0] === 'images') {
+                    addOutput(`REPOSITORY   TAG       IMAGE ID       SIZE
+nginx        latest    a1b2c3d4e5f6   142MB
+postgres     14        b2c3d4e5f6a1   374MB
+redis        alpine    c3d4e5f6a1b2   32.4MB`, 'result');
+                } else {
+                    addOutput('Docker commands: docker ps, docker images', 'info');
+                }
+            },
+
+            kubectl: (args) => {
+                if (args[0] === 'get' && args[1] === 'pods') {
+                    addOutput(`NAME                      READY   STATUS    RESTARTS   AGE
+nginx-deployment-abc123   1/1     Running   0          47d
+api-server-def456         1/1     Running   0          47d
+worker-ghi789             1/1     Running   2          47d`, 'result');
+                } else if (args[0] === 'get' && args[1] === 'nodes') {
+                    addOutput(`NAME           STATUS   ROLES           AGE   VERSION
+master-node    Ready    control-plane   90d   v1.28.0
+worker-node1   Ready    <none>          90d   v1.28.0
+worker-node2   Ready    <none>          90d   v1.28.0`, 'result');
+                } else {
+                    addOutput('kubectl commands: kubectl get pods, kubectl get nodes', 'info');
+                }
+            },
+
+            git: (args) => {
+                if (args[0] === 'status') {
+                    addOutput(`On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean`, 'result');
+                } else if (args[0] === 'log') {
+                    addOutput(`<span style="color: var(--text-yellow)">commit a1b2c3d</span> (HEAD -> main, origin/main)
+Author: edem38 <edem38@github.com>
+Date:   Fri Jan 23 2026 14:00:00
+
+    feat: Add Linux terminal simulator
+
+<span style="color: var(--text-yellow)">commit d4e5f6a</span>
+Author: edem38 <edem38@github.com>
+Date:   Thu Jan 22 2026 10:30:00
+
+    feat: Add SysMonitor dashboard`, 'result');
+                } else {
+                    addOutput('git commands: git status, git log', 'info');
+                }
+            }
+        };
+
+        // Aliases
+        commands['ll'] = () => commands.ls(['-la']);
+        commands['la'] = () => commands.ls(['-a']);
+        commands['k'] = commands.kubectl;
+
+        // Execute command
+        function executeCommand(input) {
+            const trimmed = input.trim();
+            if (!trimmed) return;
+
+            // Add to history
+            commandHistory.push(trimmed);
+            historyIndex = commandHistory.length;
+
+            // Display command
+            addOutput(getPrompt() + trimmed, 'command');
+
+            // Parse command
+            const parts = trimmed.split(/\s+/);
+            const cmd = parts[0].toLowerCase();
+            const args = parts.slice(1);
+
+            // Execute
+            if (commands[cmd]) {
+                commands[cmd](args);
+            } else {
+                addOutput(`${cmd}: commande introuvable. Tapez 'help' pour la liste des commandes.`, 'error');
+            }
+        }
+
+        // Welcome message
+        function showWelcome() {
+            addOutput(`<span class="welcome-art">
+  _     _                    _____                   _             _ 
+ | |   (_)_ __  _   ___  __ |_   _|__ _ __ _ __ ___ (_)_ __   __ _| |
+ | |   | | '_ \\| | | \\ \\/ /   | |/ _ \\ '__| '_ \` _ \\| | '_ \\ / _\` | |
+ | |___| | | | | |_| |>  <    | |  __/ |  | | | | | | | | | | (_| | |
+ |_____|_|_| |_|\\__,_/_/\\_\\   |_|\\___|_|  |_| |_| |_|_|_| |_|\\__,_|_|
+</span>`, 'result');
+            addOutput(`<span style="color: var(--text-cyan)">Bienvenue dans le simulateur de terminal Linux !</span>`, 'info');
+            addOutput(`Tapez <span style="color: var(--text-yellow)">'help'</span> pour voir les commandes disponibles.`, 'result');
+            addOutput('', 'result');
+        }
+
+        // Create input line
+        function createInputLine() {
+            const inputLine = document.createElement('div');
+            inputLine.className = 'input-line';
+            inputLine.innerHTML = getPrompt();
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.autofocus = true;
+            
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const value = input.value;
+                    inputLine.remove();
+                    executeCommand(value);
+                    createInputLine();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (historyIndex > 0) {
+                        historyIndex--;
+                        input.value = commandHistory[historyIndex];
+                    }
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (historyIndex < commandHistory.length - 1) {
+                        historyIndex++;
+                        input.value = commandHistory[historyIndex];
+                    } else {
+                        historyIndex = commandHistory.length;
+                        input.value = '';
+                    }
+                } else if (e.key === 'Tab') {
+                    e.preventDefault();
+                    // Simple tab completion
+                    const parts = input.value.split(' ');
+                    const last = parts[parts.length - 1];
+                    if (last) {
+                        const path = resolvePath(last.substring(0, last.lastIndexOf('/') + 1) || '.');
+                        const partial = last.substring(last.lastIndexOf('/') + 1);
+                        if (isDirectory(path)) {
+                            const matches = fileSystem[path].children.filter(c => c.startsWith(partial));
+                            if (matches.length === 1) {
+                                parts[parts.length - 1] = (last.includes('/') ? last.substring(0, last.lastIndexOf('/') + 1) : '') + matches[0];
+                                input.value = parts.join(' ');
+                            }
+                        }
+                    }
+                } else if (e.ctrlKey && e.key === 'l') {
+                    e.preventDefault();
+                    commands.clear();
+                    createInputLine();
+                }
+            });
+
+            inputLine.appendChild(input);
+            terminal.appendChild(inputLine);
+            input.focus();
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Focus input on terminal click
+        terminal.addEventListener('click', () => {
+            const input = terminal.querySelector('input');
+            if (input) input.focus();
+        });
+
+        // Initialize
+        showWelcome();
+        createInputLine();
+    </script>
+</body>
+</html>
