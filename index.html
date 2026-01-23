@@ -352,6 +352,29 @@
             100% { transform: rotate(360deg); }
         }
 
+        .about-image-container {
+            width: 100%;
+            aspect-ratio: 16/10;
+            border-radius: 20px;
+            border: 2px solid var(--border-color);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 212, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .about-image-container:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-5px);
+            box-shadow: 0 25px 60px rgba(0, 212, 255, 0.25);
+        }
+
+        .profile-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .about-text h3 {
             font-size: 1.8rem;
             margin-bottom: 1.5rem;
@@ -720,8 +743,8 @@
         </div>
         <div class="about-content">
             <div class="about-image">
-                <div class="about-image-placeholder">
-                    <span style="z-index: 1;">📸 Ta photo ici</span>
+                <div class="about-image-container">
+                    <img src="linux.png" alt="DevOps Setup" class="profile-image">
                 </div>
             </div>
             <div class="about-text">
@@ -814,10 +837,10 @@
         </div>
         <div class="contact-content">
             <div class="contact-methods">
-                <a href="mailto:ton.email@exemple.com" class="contact-method">
+                <a href="/cdn-cgi/l/email-protection#f7839899d9929a969e9bb7928f929a879b92d994989a" class="contact-method">
                     <div class="contact-icon">✉️</div>
                     <strong>Email</strong>
-                    <span>ton.email@exemple.com</span>
+                    <span><span class="__cf_email__" data-cfemail="e1958e8fcf848c80888da18499848c918d84cf828e8c">[email&#160;protected]</span></span>
                 </a>
                 <a href="https://github.com/edem38" target="_blank" class="contact-method">
                     <div class="contact-icon">💻</div>
@@ -833,9 +856,3 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer>
-        <p>Fait avec <span class="heart">♥</span> par edem38 — 2025</p>
-    </footer>
-</body>
-</html>
