@@ -107,7 +107,23 @@
             color: #888;
         }
 
-        /* Terminal Body */
+        
+
+        .learning-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            color: var(--text-yellow);
+            background: rgba(0,0,0,0.25);
+            white-space: nowrap;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+/* Terminal Body */
         .terminal-body {
             padding: 1rem;
             height: 500px;
@@ -291,6 +307,7 @@
                 <div class="dot dot-green"></div>
             </div>
             <div class="terminal-title">edem38@linux:~</div>
+            <div id="learningBadge" class="learning-badge hidden">🎓 Apprentissage: <span id="learningBadgeText">Linux</span></div>
         </div>
         <div class="terminal-body" id="terminal">
             <!-- Output will be inserted here -->
@@ -517,7 +534,133 @@ docker:x:999:999::/home/docker:/bin/false`
         let historyIndex = -1;
         const terminal = document.getElementById('terminal');
 
-        // Helper functions
+        
+
+        // Learning mode state
+        let terminalLocked = false;
+        const learningBadge = document.getElementById('learningBadge');
+        const learningBadgeText = document.getElementById('learningBadgeText');
+
+        const learnState = {
+            active: false,
+            moduleKey: null,
+            stepIndex: 0
+        };
+
+        const learningModules = {
+            linux: {
+                title: 'Linux (bases)',
+                steps: [
+                    { instruction: "1) Tape: pwd  (affiche le dossier courant)", expected: /^pwd$/i, hint: "Indice: la commande fait 3 lettres." },
+                    { instruction: "2) Tape: ls  (liste ce qu'il y a ici)", expected: /^ls$/i, hint: "Indice: c'est comme 'list'." },
+                    { instruction: "3) Tape: cd projets  (va dans le dossier projets)", expected: /^cd\s+projets$/i, hint: "Indice: cd + nom du dossier." },
+                    { instruction: "4) Tape: ls  (voir les projets)", expected: /^ls$/i, hint: "Indice: re-liste le dossier." },
+                    { instruction: "5) Tape: cd sysmonitor", expected: /^cd\s+sysmonitor$/i, hint: "Indice: c'est un projet de monitoring." },
+                    { instruction: "6) Tape: tree  (voir l'arborescence)", expected: /^tree$/i, hint: "Indice: commande tree." },
+                    { instruction: "7) Tape: cat README.md  (lire le README)", expected: /^cat\s+README\.md$/i, hint: "Indice: cat + fichier." },
+                    { instruction: "8) Tape: grep monitoring README.md  (chercher 'monitoring')", expected: /^grep\s+monitoring\s+README\.md$/i, hint: "Indice: grep MOT FICHIER" },
+                    { instruction: "9) Tape: cd ..  (retour)", expected: /^cd\s+\.\.$/i, hint: "Indice: cd .." },
+                    { instruction: "10) Tape: cd rts-medieval", expected: /^cd\s+rts-medieval$/i, hint: "Indice: l'autre projet de jeu." }
+                ]
+            },
+            git: {
+                title: 'Git (bases)',
+                steps: [
+                    { instruction: "1) Tape: git status  (voir l'état du repo)", expected: /^git\s+status$/i, hint: "Indice: git status" },
+                    { instruction: "2) Tape: git log  (voir l'historique)", expected: /^git\s+log$/i, hint: "Indice: git log" }
+                ]
+            },
+            docker: {
+                title: 'Docker (bases)',
+                steps: [
+                    { instruction: "1) Tape: docker ps  (voir les conteneurs)", expected: /^docker\s+ps$/i, hint: "Indice: docker ps" },
+                    { instruction: "2) Tape: docker images  (voir les images)", expected: /^docker\s+images$/i, hint: "Indice: docker images" }
+                ]
+            },
+            k8s: {
+                title: 'Kubernetes (bases)',
+                steps: [
+                    { instruction: "1) Tape: kubectl get nodes", expected: /^kubectl\s+get\s+nodes$/i, hint: "Indice: kubectl get nodes" },
+                    { instruction: "2) Tape: kubectl get pods", expected: /^kubectl\s+get\s+pods$/i, hint: "Indice: kubectl get pods" }
+                ]
+            }
+        };
+
+        function updateLearningBadge() {
+            if (!learningBadge) return;
+            if (learnState.active) {
+                learningBadge.classList.remove('hidden');
+                const title = learningModules[learnState.moduleKey]?.title || 'Apprentissage';
+                if (learningBadgeText) learningBadgeText.textContent = title;
+            } else {
+                learningBadge.classList.add('hidden');
+            }
+        }
+
+        function showCurrentLesson() {
+            const mod = learningModules[learnState.moduleKey];
+            if (!mod) return;
+
+            const step = mod.steps[learnState.stepIndex];
+            if (!step) {
+                addOutput('🎉 Module terminé ! Tape: learn list  pour en lancer un autre.', 'success');
+                stopLearning();
+                return;
+            }
+
+            addOutput(`<span style="color: var(--text-cyan)">🎓 ${mod.title}</span> — étape ${learnState.stepIndex + 1}/${mod.steps.length}`, 'info');
+            addOutput(`👉 ${escapeHTML(step.instruction)}`, 'result');
+            addOutput(`💡 Astuce: tape 'learn hint' si tu bloques.`, 'info');
+        }
+
+        function startLearning(moduleKey = 'linux') {
+            if (!learningModules[moduleKey]) {
+                addOutput(`Module inconnu: ${escapeHTML(moduleKey)}. Tape: learn list`, 'error');
+                return;
+            }
+            learnState.active = true;
+            learnState.moduleKey = moduleKey;
+            learnState.stepIndex = 0;
+            updateLearningBadge();
+            addOutput('✅ Mode apprentissage activé !', 'success');
+            showCurrentLesson();
+        }
+
+        function stopLearning() {
+            learnState.active = false;
+            learnState.moduleKey = null;
+            learnState.stepIndex = 0;
+            updateLearningBadge();
+        }
+
+        function showLearningHint() {
+            const mod = learningModules[learnState.moduleKey];
+            if (!mod) return;
+            const step = mod.steps[learnState.stepIndex];
+            if (!step) return;
+            addOutput(`💡 Indice: ${escapeHTML(step.hint || 'Relis la consigne et regarde le prompt.')}`, 'info');
+        }
+
+        function learningAfterCommand(rawInput) {
+            if (!learnState.active) return;
+
+            const mod = learningModules[learnState.moduleKey];
+            const step = mod?.steps?.[learnState.stepIndex];
+            if (!step) return;
+
+            // Don't validate the "learn" command itself
+            if (/^learn\b/i.test(rawInput)) return;
+
+            if (step.expected.test(rawInput.trim())) {
+                addOutput('✅ Correct !', 'success');
+                learnState.stepIndex++;
+                showCurrentLesson();
+            } else {
+                addOutput('❌ Pas encore. Essaie encore 😊', 'warning');
+                showLearningHint();
+            }
+        }
+// Helper functions
         function resolvePath(path) {
             if (path.startsWith('/')) {
                 return normalizePath(path);
@@ -559,7 +702,26 @@ docker:x:999:999::/home/docker:/bin/false`
             terminal.scrollTop = terminal.scrollHeight;
         }
 
-        function isDirectory(path) {
+        
+
+        // Safer output helper (no HTML)
+        function escapeHTML(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function addTextOutput(text, className = '') {
+            const line = document.createElement('div');
+            line.className = 'output-line ' + className;
+            line.textContent = text;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+function isDirectory(path) {
             return fileSystem[path] && fileSystem[path].type === 'dir';
         }
 
@@ -638,6 +800,9 @@ docker:x:999:999::/home/docker:/bin/false`
 <span class="help-command">clear</span> <span class="help-desc">Efface l'écran (ou Ctrl+L)</span>
 <span class="help-command">history</span> <span class="help-desc">Historique des commandes</span>
 <span class="help-command">exit</span> <span class="help-desc">Quitte le terminal</span>
+
+<span style="color: var(--text-yellow)">🎓 APPRENTISSAGE</span>
+<span class="help-command">learn</span> <span class="help-desc">Lance un mode d'apprentissage guidé (learn list / start / hint)</span>
 
 <span style="color: var(--text-cyan)">═══════════════════════════════════════════════════════════════</span>
 <span style="color: var(--text-purple)">💡 Astuce: Utilisez ↑↓ pour naviguer dans l'historique</span>
@@ -737,7 +902,7 @@ docker:x:999:999::/home/docker:/bin/false`
             },
 
             echo: (args) => {
-                addOutput(args.join(' '), 'result');
+                addTextOutput(args.join(' '), 'result');
             },
 
             whoami: () => {
@@ -1400,6 +1565,65 @@ Date:   Thu Jan 22 2026 10:30:00
                     addOutput('git commands: git status, git log', 'info');
                 }
             }
+            ,
+
+            learn: (args) => {
+                const action = (args[0] || '').toLowerCase();
+
+                if (!action) {
+                    addOutput(`<span style="color: var(--text-cyan)">🎓 Mode apprentissage</span>
+Tape: <span class="help-command">learn list</span> pour voir les modules
+Tape: <span class="help-command">learn start linux</span> (ou git/docker/k8s)
+Tape: <span class="help-command">learn status</span> pour voir ta progression
+Tape: <span class="help-command">learn hint</span> pour un indice
+Tape: <span class="help-command">learn stop</span> pour quitter`, 'info');
+                    return;
+                }
+
+                if (action === 'list') {
+                    addOutput(`<span style="color: var(--text-yellow)">📚 Modules disponibles</span>
+- <span class="help-command">linux</span> : bases de navigation, fichiers
+- <span class="help-command">git</span> : status, log
+- <span class="help-command">docker</span> : ps, images
+- <span class="help-command">k8s</span> : kubectl get nodes/pods
+`, 'result');
+                    return;
+                }
+
+                if (action === 'start') {
+                    const moduleKey = (args[1] || 'linux').toLowerCase();
+                    startLearning(moduleKey);
+                    return;
+                }
+
+                if (action === 'stop') {
+                    stopLearning();
+                    addOutput('🛑 Mode apprentissage désactivé.', 'info');
+                    return;
+                }
+
+                if (action === 'status') {
+                    if (!learnState.active) {
+                        addOutput("Mode apprentissage: OFF. Tape 'learn start linux' pour commencer.", 'info');
+                        return;
+                    }
+                    const mod = learningModules[learnState.moduleKey];
+                    addOutput(`🎓 ${mod.title} — étape ${learnState.stepIndex + 1}/${mod.steps.length}`, 'info');
+                    return;
+                }
+
+                if (action === 'hint') {
+                    if (!learnState.active) {
+                        addOutput("Aucun module actif. Tape 'learn start linux' d'abord.", 'info');
+                        return;
+                    }
+                    showLearningHint();
+                    return;
+                }
+
+                addOutput("Commande learn inconnue. Essaye: learn, learn list, learn start, learn stop, learn status, learn hint", 'info');
+            }
+
         };
 
         // Aliases
@@ -1416,8 +1640,8 @@ Date:   Thu Jan 22 2026 10:30:00
             commandHistory.push(trimmed);
             historyIndex = commandHistory.length;
 
-            // Display command
-            addOutput(getPrompt() + trimmed, 'command');
+            // Display command (escape user input)
+            addOutput(getPrompt() + escapeHTML(trimmed), 'command');
 
             // Parse command
             const parts = trimmed.split(/\s+/);
@@ -1428,11 +1652,12 @@ Date:   Thu Jan 22 2026 10:30:00
             if (commands[cmd]) {
                 commands[cmd](args);
             } else {
-                addOutput(`${cmd}: commande introuvable. Tapez 'help' pour la liste des commandes.`, 'error');
+                addTextOutput(`${cmd}: commande introuvable. Tapez 'help' pour la liste des commandes.`, 'error');
             }
-        }
 
-        // Welcome message
+            // Learning mode validation (after output)
+            learningAfterCommand(trimmed);
+        }        // Welcome message
         function showWelcome() {
             addOutput(`<span class="welcome-art">
   _     _                    _____                   _             _ 
@@ -1448,15 +1673,17 @@ Date:   Thu Jan 22 2026 10:30:00
 
         // Create input line
         function createInputLine() {
+            if (terminalLocked) return;
+
             const inputLine = document.createElement('div');
             inputLine.className = 'input-line';
             inputLine.innerHTML = getPrompt();
-            
+
             const input = document.createElement('input');
             input.type = 'text';
             input.autofocus = true;
-            
-            input.addEventListener('keydown', (e) => {
+            input.setAttribute('aria-label', 'terminal input');
+input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     const value = input.value;
                     inputLine.remove();
