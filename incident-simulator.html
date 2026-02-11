@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incident Simulator — DevOps Emergency Training</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e17;--panel:#111827;--term:#0c1018;--border:#1e293b;--red:#ef4444;--orange:#f59e0b;--green:#22c55e;--blue:#3b82f6;--cyan:#06b6d4;--purple:#a855f7;--txt:#e2e8f0;--dim:#64748b;--termtxt:#4ade80}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px);pointer-events:none;z-index:9999}
+.screen{display:none;min-height:100vh}.screen.active{display:flex}
+
+/* MENU */
+#menu-screen{flex-direction:column;align-items:center;justify-content:center;gap:40px;background:radial-gradient(ellipse at 50% 30%,rgba(239,68,68,.08),transparent 60%),var(--bg);position:relative}
+.menu-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(30,41,59,.3) 1px,transparent 1px),linear-gradient(90deg,rgba(30,41,59,.3) 1px,transparent 1px);background-size:60px 60px;animation:grid 20s linear infinite}
+@keyframes grid{to{transform:translate(60px,60px)}}
+.menu-title{text-align:center;z-index:1;animation:up .8s ease-out}
+.menu-title .icon{font-size:64px;display:block;margin-bottom:16px;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(1.05)}}
+.menu-title h1{font-size:48px;font-weight:900;letter-spacing:-2px;background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase}
+.menu-title .sub{font-family:'JetBrains Mono',monospace;color:var(--dim);font-size:14px;margin-top:12px;letter-spacing:3px;text-transform:uppercase}
+.menu-btns{display:flex;flex-direction:column;gap:12px;z-index:1;animation:up .8s ease-out .2s both}
+@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.mbtn{background:var(--panel);border:1px solid var(--border);color:var(--txt);font-family:'Outfit',sans-serif;font-size:16px;font-weight:500;padding:16px 48px;border-radius:8px;cursor:pointer;transition:.25s;display:flex;align-items:center;gap:12px}
+.mbtn:hover{border-color:var(--red);box-shadow:0 0 20px rgba(239,68,68,.3);transform:translateY(-2px)}
+
+/* SELECT */
+#select-screen{flex-direction:column;align-items:center;padding:60px 20px;gap:32px;position:relative}
+.back{position:absolute;top:20px;left:20px;background:none;border:1px solid var(--border);color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:13px;padding:8px 16px;border-radius:6px;cursor:pointer;transition:.2s}
+.back:hover{color:var(--txt);border-color:var(--dim)}
+#select-screen h2{font-size:32px;font-weight:700}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;max-width:1000px;width:100%}
+.scard{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:24px;cursor:pointer;transition:.3s;position:relative;overflow:hidden}
+.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--orange));opacity:0;transition:.3s}
+.scard:hover{border-color:var(--red);transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.scard:hover::before{opacity:1}
+.scard .ci{font-size:32px;margin-bottom:12px}
+.scard h3{font-size:18px;font-weight:700;margin-bottom:8px}
+.scard p{font-size:14px;color:var(--dim);line-height:1.5;margin-bottom:16px}
+.cmeta{display:flex;gap:12px;font-family:'JetBrains Mono',monospace;font-size:11px}
+.ctag{padding:4px 10px;border-radius:99px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.teasy{background:rgba(34,197,94,.15);color:var(--green)}
+.tmed{background:rgba(245,158,11,.15);color:var(--orange)}
+.thard{background:rgba(239,68,68,.15);color:var(--red)}
+
+/* TUTORIAL */
+#tut-screen{flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:32px;position:relative}
+.tbox{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:40px;max-width:700px;width:100%;animation:up .5s ease-out}
+.tbox h2{font-size:28px;font-weight:700;margin-bottom:8px}
+.tbox .step{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:24px;text-transform:uppercase;letter-spacing:2px}
+.tbox p{font-size:16px;line-height:1.7;color:var(--dim);margin-bottom:16px}
+.tbox code{font-family:'JetBrains Mono',monospace;background:var(--term);color:var(--termtxt);padding:3px 8px;border-radius:4px;font-size:14px}
+.tbox .ex{background:var(--term);border:1px solid var(--border);border-radius:8px;padding:16px;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--termtxt);line-height:1.8}
+.tnav{display:flex;gap:12px;margin-top:24px}
+.tbtn{flex:1;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:.2s}
+.tbtn:hover{border-color:var(--blue)}
+.tbtn.pri{background:linear-gradient(135deg,var(--red),var(--orange));border:none;font-weight:700}
+.tbtn.pri:hover{opacity:.9}
+
+/* GAME */
+#game-screen{flex-direction:column;height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--panel);border-bottom:1px solid var(--border);flex-shrink:0}
+.tbl{display:flex;align-items:center;gap:16px}
+.badge{display:flex;align-items:center;gap:8px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:6px 14px;border-radius:99px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--red);animation:ap 1.5s ease-in-out infinite}
+@keyframes ap{0%,100%{opacity:1}50%{opacity:.6}}
+.badge.ok{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:var(--green);animation:none}
+.sname{font-weight:700;font-size:15px}
+.tbr{display:flex;align-items:center;gap:20px}
+.timer{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--orange);letter-spacing:2px}
+.qbtn{background:none;border:1px solid var(--border);color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 14px;border-radius:6px;cursor:pointer;transition:.2s}
+.qbtn:hover{border-color:var(--red);color:var(--red)}
+.glayout{display:grid;grid-template-columns:280px 1fr;flex:1;overflow:hidden}
+.side{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.psec{padding:16px;border-bottom:1px solid var(--border)}
+.psec h4{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:12px}
+.met{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:13px}
+.ml{color:var(--dim)}.mv{font-family:'JetBrains Mono',monospace;font-weight:700}
+.mbar{width:100%;height:6px;background:var(--bg);border-radius:3px;margin-top:4px;overflow:hidden}
+.mfill{height:100%;border-radius:3px;transition:.5s}
+.olist{list-style:none;display:flex;flex-direction:column;gap:8px}
+.obj{font-size:13px;color:var(--dim);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.obj .ck{flex-shrink:0;width:18px;height:18px;border:2px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:1px}
+.obj.done .ck{background:var(--green);border-color:var(--green);color:#000}
+.obj.done{color:var(--green);text-decoration:line-through}
+.logs{flex:1;overflow-y:auto;padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;color:var(--dim)}
+.le{margin-bottom:2px}.le .lt{color:var(--dim)}.le.error{color:var(--red)}.le.warn{color:var(--orange)}.le.info{color:var(--cyan)}.le.success{color:var(--green)}
+
+.tarea{display:flex;flex-direction:column;overflow:hidden;background:var(--term)}
+.thead{display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(0,0,0,.3);border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)}
+.dots{display:flex;gap:6px}.dots span{width:10px;height:10px;border-radius:50%}.dots span:nth-child(1){background:var(--red)}.dots span:nth-child(2){background:var(--orange)}.dots span:nth-child(3){background:var(--green)}
+.tout{flex:1;overflow-y:auto;padding:16px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;color:var(--termtxt)}
+.tout .ol{margin-bottom:2px;white-space:pre-wrap;word-break:break-all}
+.tout .ol.o-error{color:var(--red)}.tout .ol.o-warn{color:var(--orange)}.tout .ol.o-info{color:var(--cyan)}.tout .ol.o-success{color:var(--green)}.tout .ol.o-system{color:var(--purple)}
+.hbar{padding:8px 16px;background:rgba(59,130,246,.08);border-top:1px solid rgba(59,130,246,.2);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.hbar .hk{background:rgba(59,130,246,.2);padding:2px 6px;border-radius:3px;font-weight:700}
+.tinl{display:flex;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:rgba(0,0,0,.2);gap:8px}
+.pp{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--cyan);flex-shrink:0;white-space:nowrap}
+.tinput{flex:1;background:none;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--termtxt);caret-color:var(--termtxt)}
+
+/* RESULT */
+#res-screen{flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:40px 20px}
+.rbox{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:48px;text-align:center;max-width:500px;width:100%;animation:up .6s ease-out}
+.ricon{font-size:64px;margin-bottom:16px}
+.rbox h2{font-size:32px;font-weight:900;margin-bottom:8px}
+.rbox .rsub{color:var(--dim);font-size:15px;margin-bottom:32px}
+.rstats{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+.rst{background:var(--bg);padding:16px;border-radius:8px}
+.rst .rv{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:var(--cyan)}
+.rst .rl{font-size:12px;color:var(--dim);margin-top:4px}
+.racts{display:flex;gap:12px}
+.racts button{flex:1;padding:14px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:.2s;border:1px solid var(--border);background:var(--bg);color:var(--txt)}
+.racts button:hover{border-color:var(--blue)}
+.racts button.pri{background:linear-gradient(135deg,var(--red),var(--orange));border:none}
+
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+@media(max-width:768px){.glayout{grid-template-columns:1fr;grid-template-rows:auto 1fr}.side{border-right:none;border-bottom:1px solid var(--border);max-height:200px;overflow-y:auto}.menu-title h1{font-size:32px}.sgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="menu-screen" class="screen active">
+  <div class="menu-bg"></div>
+  <div class="menu-title">
+    <span class="icon">🚨</span>
+    <h1>Incident<br>Simulator</h1>
+    <div class="sub">DevOps Emergency Training</div>
+  </div>
+  <div class="menu-btns">
+    <button class="mbtn" onclick="showScreen('select-screen')"><span>▶</span> Jouer</button>
+    <button class="mbtn" onclick="startTut()"><span>📖</span> Tutoriel</button>
+  </div>
+</div>
+
+<div id="select-screen" class="screen">
+  <button class="back" onclick="showScreen('menu-screen')">← Retour</button>
+  <h2>Choisir un incident</h2>
+  <div class="sgrid" id="sgrid"></div>
+</div>
+
+<div id="tut-screen" class="screen">
+  <button class="back" onclick="showScreen('menu-screen')">← Retour</button>
+  <div class="tbox" id="tbox"></div>
+</div>
+
+<div id="game-screen" class="screen">
+  <div class="topbar">
+    <div class="tbl">
+      <div class="badge" id="badge"><span>●</span> INCIDENT EN COURS</div>
+      <span class="sname" id="gsname"></span>
+    </div>
+    <div class="tbr">
+      <div class="timer" id="timer">00:00</div>
+      <button class="qbtn" onclick="quitGame()">✕ Quitter</button>
+    </div>
+  </div>
+  <div class="glayout">
+    <div class="side">
+      <div class="psec" id="mpanel"></div>
+      <div class="psec"><h4>Objectifs</h4><ul class="olist" id="olist"></ul></div>
+      <div class="logs" id="lpanel"></div>
+    </div>
+    <div class="tarea">
+      <div class="thead"><div class="dots"><span></span><span></span><span></span></div><span>ops@server ~ $</span></div>
+      <div class="tout" id="tout"></div>
+      <div class="hbar"><span class="hk">TAB</span> complétion <span style="margin-left:12px" class="hk">↑↓</span> historique <span style="margin-left:12px" class="hk">help</span> commandes</div>
+      <div class="tinl"><span class="pp">ops@server:~$</span><input type="text" class="tinput" id="tinput" autocomplete="off" spellcheck="false" autofocus></div>
+    </div>
+  </div>
+</div>
+
+<div id="res-screen" class="screen">
+  <div class="rbox" id="rbox"></div>
+</div>
+
+<script>
+// ============================================================
+// SCENARIOS
+// ============================================================
+const SC=[
+{id:'dns',icon:'🌐',title:'DNS en panne',desc:'Les utilisateurs ne peuvent plus accéder au site. Erreurs de résolution DNS massives.',diff:'easy',dl:'Facile',
+metrics:{'Uptime':{v:0,max:100,u:'%'},'Requêtes échouées':{v:847,max:1000,u:'/min'},'Utilisateurs impactés':{v:12400,max:15000,u:''}},
+objs:[{id:'diag',t:'Diagnostiquer le problème DNS'},{id:'find',t:'Identifier la cause root'},{id:'fix',t:'Réparer la configuration DNS'},{id:'verify',t:'Vérifier la résolution'}],
+initLogs:[{c:'error',m:'ALERT: DNS resolution failures — api.company.com'},{c:'error',m:'ALERT: 503 errors spiking on LB'},{c:'warn',m:'85% health checks failing'},{c:'info',m:'On-call notified via PagerDuty'}],
+initOut:[{t:'🚨 INCIDENT ALERT — Severity: P1',c:'system'},{t:'Utilisateurs: erreurs "Site inaccessible".',c:'system'},{t:'Monitoring: failures DNS massifs.',c:'system'},{t:'',c:''},{t:'Tapez "help" pour les commandes.',c:'info'}],
+cmds:{
+'help':{out:[{t:'=== COMMANDES DISPONIBLES ===',c:'info'},{t:'dig <domain>          — Requête DNS',c:''},{t:'nslookup <domain>     — Résolution DNS',c:''},{t:'cat /etc/resolv.conf  — Config DNS',c:''},{t:'systemctl status named — Status service DNS',c:''},{t:'systemctl restart named — Redémarrer DNS',c:''},{t:'journalctl -u named    — Logs service DNS',c:''},{t:'cat /etc/named.conf    — Config BIND',c:''},{t:'nano /etc/named.conf   — Éditer config',c:''},{t:'named-checkconf        — Valider config',c:''},{t:'ping <host>            — Connectivité',c:''},{t:'curl <url>             — Test HTTP',c:''},{t:'hint                   — Indice',c:''}]},
+'dig api.company.com':{out:[{t:'; <<>> DiG 9.18.1 <<>> api.company.com',c:''},{t:';; connection timed out; no servers could be reached',c:''},{t:';; SERVFAIL — no response from nameserver',c:'error'}],trig:['diag']},
+'nslookup api.company.com':{out:[{t:'Server:    10.0.0.2',c:''},{t:'Address:   10.0.0.2#53',c:''},{t:"** server can't find api.company.com: SERVFAIL",c:'error'}],trig:['diag']},
+'ping api.company.com':{out:[{t:'ping: api.company.com: Temporary failure in name resolution',c:'error'}]},
+'cat /etc/resolv.conf':{out:[{t:'# Generated by NetworkManager',c:''},{t:'nameserver 10.0.0.2',c:''},{t:'nameserver 8.8.8.8',c:''}]},
+'systemctl status named':{out:[{t:'● named.service - BIND Domain Name Server',c:''},{t:'   Loaded: loaded',c:''},{t:'   Active: active (running) but DEGRADED',c:'error'},{t:'   Warning: configuration file has errors',c:'warn'}],trig:['diag']},
+'journalctl -u named':{out:[{t:'Feb 11 03:42:01 named: loading configuration...',c:''},{t:'Feb 11 03:42:01 named: zone company.com/IN: loading failed',c:'error'},{t:'Feb 11 03:42:01 named: /etc/named.conf:24: missing semicolon',c:'error'},{t:'Feb 11 03:42:02 named: running with degraded configuration',c:'warn'}],trig:['find'],log:{c:'warn',m:'Root cause: erreur syntaxe named.conf ligne 24'}},
+'cat /etc/named.conf':{out:[{t:'// BIND configuration',c:''},{t:'options {',c:''},{t:'    directory "/var/named";',c:''},{t:'    listen-on port 53 { any; };',c:''},{t:'};',c:''},{t:'',c:''},{t:'zone "company.com" IN {',c:''},{t:'    type master;',c:''},{t:'    file "company.com.zone"    ← POINT-VIRGULE MANQUANT !',c:'error'},{t:'};',c:''}],trig:['find']},
+'named-checkconf':{out:[{t:"/etc/named.conf:24: missing ';' before end of line",c:'error'},{t:'configuration check failed',c:'error'}],trig:['find']},
+'nano /etc/named.conf':{out:[{t:'[nano] Ouverture de /etc/named.conf...',c:'success'},{t:'Correction: ajout du point-virgule manquant ligne 24',c:'info'},{t:'[nano] Fichier sauvegardé.',c:'success'}],trig:['fix'],log:{c:'success',m:'Config DNS corrigée'}},
+'vim /etc/named.conf':{out:[{t:'[vim] Correction: point-virgule ajouté ligne 24',c:'success'},{t:'[vim] Sauvegardé.',c:'success'}],trig:['fix'],log:{c:'success',m:'Config DNS corrigée'}},
+'systemctl restart named':{out:[{t:'Restarting BIND DNS Server...',c:'info'},{t:'● named.service — Active: active (running) — fully operational',c:'success'},{t:'All zones loaded successfully.',c:'success'}],trig:['fix'],log:{c:'success',m:'Service DNS redémarré'},mu:{'Uptime':99.9,'Requêtes échouées':2,'Utilisateurs impactés':0}},
+'hint':{out:[{t:'💡 INDICE:',c:'info'},{t:'1. Diagnostiquez: dig, nslookup, systemctl status',c:''},{t:'2. Cause: journalctl -u named',c:''},{t:'3. Inspectez: cat /etc/named.conf',c:''},{t:'4. Corrigez: nano + systemctl restart',c:''}]}
+},
+postCmds:{
+'dig api.company.com':{out:[{t:'; <<>> DiG 9.18.1 <<>> api.company.com',c:''},{t:';; ANSWER SECTION:',c:''},{t:'api.company.com.  300  IN  A  10.0.1.50',c:'success'}],trig:['verify']},
+'nslookup api.company.com':{out:[{t:'Name:  api.company.com',c:'success'},{t:'Address: 10.0.1.50',c:'success'}],trig:['verify']},
+'curl api.company.com':{out:[{t:'HTTP/1.1 200 OK',c:'success'},{t:'{"status":"healthy"}',c:'success'}],trig:['verify']},
+'ping api.company.com':{out:[{t:'64 bytes from 10.0.1.50: icmp_seq=1 ttl=64 time=0.45ms',c:'success'}],trig:['verify']}
+}},
+
+{id:'db',icon:'🗄️',title:'Base de données saturée',desc:"L'API est extrêmement lente. PostgreSQL saturé avec connexions bloquées.",diff:'medium',dl:'Moyen',
+metrics:{'Temps réponse':{v:12000,max:15000,u:'ms'},'Connexions DB':{v:98,max:100,u:'/100'},'CPU DB':{v:97,max:100,u:'%'}},
+objs:[{id:'diag',t:'Diagnostiquer la surcharge DB'},{id:'find',t:'Trouver la requête problématique'},{id:'kill',t:'Terminer les requêtes bloquantes'},{id:'fix',t:"Ajouter l'index manquant"},{id:'verify',t:'Vérifier le retour à la normale'}],
+initLogs:[{c:'error',m:'ALERT: API response time > 10s'},{c:'error',m:'ALERT: PostgreSQL 98/100 connexions'},{c:'warn',m:'CPU spike on db-primary-01'},{c:'info',m:'On-call notified'}],
+initOut:[{t:'🚨 INCIDENT ALERT — Severity: P1',c:'system'},{t:"L'API est extrêmement lente (>10s).",c:'system'},{t:'PostgreSQL semble saturé.',c:'system'},{t:'',c:''},{t:'Tapez "help" pour les commandes.',c:'info'}],
+cmds:{
+'help':{out:[{t:'=== COMMANDES DISPONIBLES ===',c:'info'},{t:'psql                    — Connecter PostgreSQL',c:''},{t:'pg_stat                 — Stats connexions',c:''},{t:'pg_locks                — Verrous actifs',c:''},{t:'pg_slow_queries         — Requêtes lentes',c:''},{t:'pg_kill <pid>           — Terminer requête',c:''},{t:'pg_kill_slow            — Terminer toutes lentes',c:''},{t:'explain_query           — Analyser requête',c:''},{t:'create_index            — Créer index manquant',c:''},{t:'top                     — Processus système',c:''},{t:'curl api.company.com/health — Health check',c:''},{t:'hint                    — Indice',c:''}]},
+'top':{out:[{t:'load average: 18.72, 16.45, 12.30',c:''},{t:'%Cpu: 97.2% us',c:'error'},{t:'PID 3842 postgres 45.2% — SELECT waiting',c:'error'},{t:'PID 3901 postgres 28.7% — SELECT waiting',c:'error'}],trig:['diag']},
+'psql':{out:[{t:'psql (15.4) — Connected to "production"',c:'success'},{t:'WARNING: 98 of 100 connections in use',c:'warn'}],trig:['diag']},
+'pg_stat':{out:[{t:'=== CONNEXIONS POSTGRESQL ===',c:'info'},{t:'Total: 98/100',c:''},{t:'Active: 47  |  Waiting: 38  |  Idle in tx: 13',c:'error'},{t:'Longest query: 847 seconds',c:'error'},{t:'Avg query time: 23.4s (normal: 50ms)',c:'warn'}],trig:['diag']},
+'pg_locks':{out:[{t:'=== VERROUS ACTIFS ===',c:'info'},{t:'PID 3842: ExclusiveLock on "orders" — 847s',c:'error'},{t:'   ↳ 38 queries WAITING',c:'error'}],trig:['find']},
+'pg_slow_queries':{out:[{t:'=== REQUÊTES LENTES (>5s) ===',c:'info'},{t:'',c:''},{t:'PID 3842 | 847s | SELECT * FROM orders',c:'error'},{t:"  WHERE created_at > '2025-01-01' AND status = 'pending'",c:'error'},{t:'  → Seq Scan on orders (2.4M rows!) — NO INDEX',c:'error'},{t:'',c:''},{t:'38 additional queries blocked by PID 3842',c:'warn'}],trig:['find'],log:{c:'warn',m:'Root cause: full scan "orders" 2.4M rows, pas d\'index'}},
+'explain_query':{out:[{t:'Seq Scan on orders (cost=0..185432 rows=2400000)',c:'error'},{t:'  Rows Removed by Filter: 2,156,000',c:'error'},{t:'  Execution Time: STILL RUNNING...',c:'error'},{t:'⚠ Aucun index sur (created_at, status)',c:'warn'}],trig:['find']},
+'pg_kill 3842':{out:[{t:'Sending SIGTERM to PID 3842...',c:'info'},{t:'Query terminated. 38 waiting queries released.',c:'success'}],trig:['kill'],log:{c:'success',m:'PID 3842 terminé'},mu:{'Connexions DB':52,'CPU DB':65}},
+'pg_kill_slow':{out:[{t:'Terminating all slow queries...',c:'info'},{t:'PID 3842, 3901, 3955 terminated.',c:'success'},{t:'38 blocked queries released.',c:'success'}],trig:['kill'],log:{c:'success',m:'Requêtes lentes terminées'},mu:{'Connexions DB':12,'CPU DB':35}},
+'create_index':{out:[{t:'CREATE INDEX CONCURRENTLY idx_orders_created_status',c:'info'},{t:'  ON orders (created_at, status);',c:'info'},{t:'Building index... ████████████████████ 100%',c:''},{t:'INDEX CREATED SUCCESSFULLY',c:'success'},{t:'Before: Seq Scan ~850s → After: Index Scan ~45ms',c:'success'}],trig:['fix'],log:{c:'success',m:'Index créé'},mu:{'Temps réponse':48,'Connexions DB':8,'CPU DB':12}},
+'hint':{out:[{t:'💡 INDICE:',c:'info'},{t:'1. Diagnostiquez: top, pg_stat',c:''},{t:'2. Cause: pg_slow_queries, pg_locks',c:''},{t:'3. Libérez: pg_kill_slow',c:''},{t:'4. Corrigez: create_index',c:''},{t:'5. Vérifiez: curl api.company.com/health',c:''}]}
+},
+postCmds:{
+'curl api.company.com/health':{out:[{t:'HTTP/1.1 200 OK',c:'success'},{t:'{"status":"healthy","db_time":"45ms","conn":"8/100"}',c:'success'}],trig:['verify']},
+'pg_stat':{out:[{t:'Total: 8/100 | Active: 3 | Waiting: 0',c:'success'},{t:'Avg query time: 45ms ✓',c:'success'}],trig:['verify']},
+'top':{out:[{t:'load average: 1.20, 4.52, 8.30',c:''},{t:'%Cpu: 12.1% us — 85.5% idle',c:'success'}],trig:['verify']}
+}},
+
+{id:'mem',icon:'💾',title:'Fuite mémoire',desc:'Le serveur Node.js consomme de plus en plus de RAM. OOM killer imminent.',diff:'medium',dl:'Moyen',
+metrics:{'RAM':{v:93,max:100,u:'%'},'Heap Node.js':{v:1840,max:2048,u:'MB'},'Uptime API':{v:100,max:100,u:'%'}},
+objs:[{id:'diag',t:"Diagnostiquer l'utilisation mémoire"},{id:'find',t:'Identifier la fuite mémoire'},{id:'fix',t:'Déployer le hotfix'},{id:'verify',t:'Vérifier la stabilisation'}],
+initLogs:[{c:'error',m:'ALERT: Memory > 90% on app-server-01'},{c:'warn',m:'OOM killer may trigger soon'},{c:'warn',m:'Heap growing 50MB/min'},{c:'info',m:'On-call notified'}],
+initOut:[{t:'🚨 INCIDENT ALERT — Severity: P2',c:'system'},{t:'app-server-01: 93% RAM.',c:'system'},{t:'Heap Node.js anormalement élevé.',c:'system'},{t:'',c:''},{t:'Tapez "help" pour les commandes.',c:'info'}],
+cmds:{
+'help':{out:[{t:'=== COMMANDES DISPONIBLES ===',c:'info'},{t:'free -h              — Mémoire système',c:''},{t:'top                  — Processus',c:''},{t:'node_heap            — Stats heap Node.js',c:''},{t:'node_heapdump        — Snapshot heap',c:''},{t:'analyze_heap         — Analyser heap dump',c:''},{t:'cat /app/server.js   — Code source',c:''},{t:'git log --oneline    — Derniers commits',c:''},{t:'git diff HEAD~1      — Diff dernier commit',c:''},{t:'git revert HEAD      — Reverter commit',c:''},{t:"pm2 restart app      — Redémarrer l'app",c:''},{t:'pm2 status           — Status app',c:''},{t:'hint                 — Indice',c:''}]},
+'free -h':{out:[{t:'              total    used    free',c:''},{t:'Mem:          8.0Gi   7.4Gi   0.2Gi',c:'error'},{t:'Swap:         2.0Gi   1.8Gi   0.2Gi',c:''}],trig:['diag']},
+'top':{out:[{t:'%Cpu: 34.2% — %Mem: 93.2%',c:'error'},{t:'PID 2201 node 34.1% 89.2% 1840MB node /app/server.js',c:'error'},{t:'PID 1105 root  2.1%  1.2%   96MB nginx',c:''}],trig:['diag']},
+'node_heap':{out:[{t:'=== NODE.JS HEAP ===',c:'info'},{t:'Used: 1,840 MB / 2,048 MB (89.8%)',c:'error'},{t:'Growth: +52 MB/min (ABNORMAL)',c:'warn'},{t:'GC Reclaimed: only 2% per cycle',c:'warn'},{t:'⚠ Memory leak detected',c:'error'}],trig:['diag']},
+'node_heapdump':{out:[{t:'Snapshot saved: /tmp/heapdump.json (248MB)',c:'info'},{t:'Use "analyze_heap" to examine.',c:'info'}]},
+'analyze_heap':{out:[{t:'=== HEAP ANALYSIS ===',c:'info'},{t:'',c:''},{t:'TOP RETAINED OBJECTS:',c:'error'},{t:'1. Array (requestCache) — 1,247 MB (67.8%)',c:'error'},{t:'   → 2,847,000 objects, NEVER evicted',c:'error'},{t:'2. Map (sessions) — 312 MB',c:''},{t:'',c:''},{t:'⚠ "requestCache" grows indefinitely!',c:'warn'},{t:'💡 Vérifiez: cat /app/server.js ou git log',c:'info'}],trig:['find'],log:{c:'warn',m:'Heap: requestCache = 1.2GB, croissance infinie'}},
+'cat /app/server.js':{out:[{t:'const express = require("express");',c:''},{t:'const app = express();',c:''},{t:'',c:''},{t:'// BUG: cache sans limite !',c:'error'},{t:'const requestCache = [];',c:'error'},{t:'',c:''},{t:'app.get("/api/data", (req, res) => {',c:''},{t:'  requestCache.push({ query: req.query, result: data, ts: Date.now() });',c:'error'},{t:'  // ⚠ Pas de limite, pas de nettoyage !',c:'warn'},{t:'  res.json(data);',c:''},{t:'});',c:''}],trig:['find']},
+'git log --oneline':{out:[{t:'a3f8b2c (HEAD) feat: add request caching',c:'error'},{t:'7d1e4a9 fix: update rate limiter',c:''},{t:'b29c6f1 chore: update dependencies',c:''}],trig:['find']},
+'git diff HEAD~1':{out:[{t:'commit a3f8b2c — "feat: add request caching"',c:'info'},{t:'+ const requestCache = [];',c:'error'},{t:'+ requestCache.push({ query, result, ts });',c:'error'},{t:'  // Aucune éviction !',c:'warn'}],trig:['find'],log:{c:'warn',m:'Cause: commit a3f8b2c — cache sans éviction'}},
+'git revert HEAD':{out:[{t:'Reverting commit a3f8b2c...',c:'info'},{t:'[main c4b9a1d] Revert "feat: add request caching"',c:'success'},{t:'Utilisez "pm2 restart app" pour appliquer.',c:'info'}],trig:['fix'],log:{c:'success',m:'Commit a3f8b2c reverté'}},
+'pm2 restart app':{out:[{t:'Restarting app...',c:'info'},{t:'[PM2] app ✓ restarted',c:'success'},{t:'│ app │ online │ 2.1% │ 128MB │',c:'success'}],trig:['fix'],log:{c:'success',m:'App redémarrée — heap libéré'},mu:{'RAM':22,'Heap Node.js':128}},
+'hint':{out:[{t:'💡 INDICE:',c:'info'},{t:'1. Diagnostiquez: free -h, top, node_heap',c:''},{t:'2. Analysez: node_heapdump + analyze_heap',c:''},{t:'3. Code: cat /app/server.js ou git diff',c:''},{t:'4. Fix: git revert HEAD + pm2 restart app',c:''},{t:'5. Vérifiez: free -h, node_heap',c:''}]}
+},
+postCmds:{
+'free -h':{out:[{t:'Mem:          8.0Gi   1.8Gi   5.4Gi',c:'success'},{t:'Swap:         2.0Gi   0.0Gi   2.0Gi',c:''}],trig:['verify']},
+'node_heap':{out:[{t:'Used: 128 MB / 2,048 MB (6.3%)',c:'success'},{t:'Growth: stable (±2 MB/min)',c:'success'},{t:'GC Reclaimed: 38% per cycle ✓',c:'success'}],trig:['verify']},
+'pm2 status':{out:[{t:'│ app │ online │ 2.1% │ 131MB │ 2m │',c:'success'}],trig:['verify']},
+'top':{out:[{t:'%Cpu: 5.1% — %Mem: 22.5%',c:'success'},{t:'PID 4102 node 2.1% 1.6% 131MB',c:'success'}],trig:['verify']}
+}}
+];
+
+// ============================================================
+// TUTORIAL
+// ============================================================
+const TUT=[
+{title:'Bienvenue, ingénieur !',html:'<p>Dans <strong>Incident Simulator</strong>, vous êtes l\'ingénieur on-call. Des incidents de production surviennent et c\'est à vous de les résoudre.</p><p>Mission : <strong>diagnostiquer</strong> → <strong>identifier</strong> → <strong>corriger</strong> → <strong>vérifier</strong>.</p>'},
+{title:"L'interface",html:'<p>📊 <strong>Panneau latéral</strong> — Métriques live, objectifs, logs monitoring.</p><p>⌨️ <strong>Terminal</strong> — Tapez vos commandes pour investiguer.</p><p>⏱️ <strong>Chronomètre</strong> en haut mesure votre temps.</p>'},
+{title:'Les commandes',html:'<p>Tapez <code>help</code> pour voir les commandes disponibles.</p><div class="ex">ops@server:~$ help<br>ops@server:~$ dig api.company.com<br>ops@server:~$ systemctl status named</div><p><code>hint</code> si bloqué. <strong>↑↓</strong> pour l\'historique. <strong>TAB</strong> pour compléter.</p>'},
+{title:'Les objectifs',html:'<p>Chaque incident a des objectifs dans l\'ordre :</p><p>1️⃣ <strong>Diagnostiquer</strong><br>2️⃣ <strong>Identifier</strong> la cause root<br>3️⃣ <strong>Corriger</strong><br>4️⃣ <strong>Vérifier</strong></p><p>Ils se complètent automatiquement avec les bonnes commandes.</p>'},
+{title:'Prêt à jouer !',html:'<p>🔍 Lisez les <strong>logs</strong> et <strong>sorties</strong> — les indices sont là.</p><p>🧠 Procédez <strong>méthodiquement</strong>.</p><p>⚡ Le chrono tourne, mais mieux vaut comprendre que taper au hasard !</p><p>Bonne chance ! 🚀</p>'}
+];
+let tStep=0;
+function startTut(){tStep=0;showScreen('tut-screen');renderTut()}
+function renderTut(){const s=TUT[tStep],b=document.getElementById('tbox'),last=tStep===TUT.length-1,first=tStep===0;
+b.innerHTML=`<div class="step">Étape ${tStep+1}/${TUT.length}</div><h2>${s.title}</h2>${s.html}<div class="tnav">${first?'':'<button class="tbtn" onclick="tStep--;renderTut()">← Précédent</button>'}${last?'<button class="tbtn pri" onclick="showScreen(\'select-screen\')">Jouer ▶</button>':'<button class="tbtn pri" onclick="tStep++;renderTut()">Suivant →</button>'}</div>`}
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let G={sc:null,t0:null,iv:null,sec:0,hist:[],hi:-1,done:new Set(),fixed:false,cc:0};
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='select-screen')renderCards();if(id==='game-screen')document.getElementById('tinput').focus()}
+
+function renderCards(){const g=document.getElementById('sgrid');g.innerHTML='';SC.forEach(s=>{const d=document.createElement('div');d.className='scard';d.innerHTML=`<div class="ci">${s.icon}</div><h3>${s.title}</h3><p>${s.desc}</p><div class="cmeta"><span class="ctag t${s.diff==='easy'?'easy':s.diff==='medium'?'med':'hard'}">${s.dl}</span><span class="ctag" style="background:rgba(59,130,246,.15);color:var(--blue)">${s.objs.length} obj.</span></div>`;d.onclick=()=>startGame(s);g.appendChild(d)})}
+
+function startGame(sc){G={sc:JSON.parse(JSON.stringify(sc)),t0:Date.now(),iv:null,sec:0,hist:[],hi:-1,done:new Set(),fixed:false,cc:0};
+document.getElementById('gsname').textContent=sc.title;
+const b=document.getElementById('badge');b.className='badge';b.innerHTML='<span>●</span> INCIDENT EN COURS';
+renderMet();renderObj();
+const lp=document.getElementById('lpanel');lp.innerHTML='<div style="padding:0 0 8px"><h4 style="font-family:JetBrains Mono,monospace;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--dim)">Monitoring</h4></div>';
+sc.initLogs.forEach(l=>addLog(l.c,l.m));
+const to=document.getElementById('tout');to.innerHTML='';sc.initOut.forEach(l=>appOut(l.t,l.c));
+document.getElementById('timer').textContent='00:00';G.iv=setInterval(tick,1000);showScreen('game-screen')}
+
+function renderMet(){const p=document.getElementById('mpanel'),m=G.sc.metrics;p.innerHTML='<h4>Métriques Live</h4>';
+Object.entries(m).forEach(([n,d])=>{const pct=(d.v/d.max)*100,col=pct>80?'var(--red)':pct>50?'var(--orange)':'var(--green)';
+p.innerHTML+=`<div class="met"><span class="ml">${n}</span><span class="mv" style="color:${col}">${d.v}${d.u}</span></div><div class="mbar"><div class="mfill" style="width:${pct}%;background:${col}"></div></div>`})}
+
+function renderObj(){const l=document.getElementById('olist');l.innerHTML='';G.sc.objs.forEach(o=>{const d=G.done.has(o.id);l.innerHTML+=`<li class="obj ${d?'done':''}"><span class="ck">${d?'✓':''}</span>${o.t}</li>`})}
+
+function tick(){G.sec++;const m=String(Math.floor(G.sec/60)).padStart(2,'0'),s=String(G.sec%60).padStart(2,'0');document.getElementById('timer').textContent=`${m}:${s}`}
+
+function appOut(text,cls=''){const o=document.getElementById('tout'),d=document.createElement('div');d.className=`ol${cls?' o-'+cls:''}`;d.textContent=text;o.appendChild(d);o.scrollTop=o.scrollHeight}
+
+function addLog(cls,msg){const p=document.getElementById('lpanel'),t=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),d=document.createElement('div');d.className=`le ${cls}`;d.innerHTML=`<span class="lt">[${t}]</span> ${msg}`;p.appendChild(d);p.scrollTop=p.scrollHeight}
+
+function compObj(id){if(G.done.has(id))return;G.done.add(id);renderObj();if(G.sc.objs.every(o=>G.done.has(o.id)))setTimeout(()=>endGame(true),800)}
+
+function proc(cmd){const c=cmd.trim();if(!c)return;G.hist.push(c);G.hi=G.hist.length;G.cc++;appOut(`ops@server:~$ ${c}`,'');
+const sc=G.sc;
+// post-fix commands
+if(G.fixed&&sc.postCmds&&sc.postCmds[c]){const d=sc.postCmds[c];d.out.forEach(l=>appOut(l.t,l.c));if(d.trig)d.trig.forEach(compObj);if(d.log)addLog(d.log.c,d.log.m);return}
+const d=sc.cmds[c];
+if(!d){const pk=Object.keys(sc.cmds).find(k=>c.startsWith(k.split(' ')[0])&&k!=='help'&&k!=='hint');
+if(pk&&c!==pk)appOut(`Essayez: ${pk}`,'warn');else{appOut(`bash: ${c.split(' ')[0]}: command not found`,'error');appOut('Tapez "help" pour la liste.',"info")}return}
+if(d.dyn){if(!G.fixed){if(c.includes('curl'))appOut('curl: (7) Failed to connect','error');else if(c==='pm2 status')appOut('│ app │ online │ 34% │ 1.8GB │','error')}return}
+d.out.forEach(l=>appOut(l.t,l.c));
+if(d.trig)d.trig.forEach(t=>{if(t==='fix')G.fixed=true;compObj(t)});
+if(d.log)addLog(d.log.c,d.log.m);
+if(d.mu){Object.entries(d.mu).forEach(([k,v])=>{if(sc.metrics[k])sc.metrics[k].v=v});renderMet()}
+if(G.fixed){const b=document.getElementById('badge');b.className='badge ok';b.innerHTML='<span>●</span> STABILISATION'}}
+
+function endGame(ok){clearInterval(G.iv);const m=Math.floor(G.sec/60),s=G.sec%60,ts=`${m}m ${String(s).padStart(2,'0')}s`;
+let r,rc;if(G.sec<120){r='S';rc='var(--purple)'}else if(G.sec<240){r='A';rc='var(--green)'}else if(G.sec<360){r='B';rc='var(--cyan)'}else if(G.sec<480){r='C';rc='var(--orange)'}else{r='D';rc='var(--red)'}
+const sid=G.sc.id;
+document.getElementById('rbox').innerHTML=`<div class="ricon">${ok?'✅':'❌'}</div><h2 style="color:${ok?'var(--green)':'var(--red)'}">${ok?'Incident Résolu !':'Non Résolu'}</h2><p class="rsub">${G.sc.title}</p><div class="rstats"><div class="rst"><div class="rv">${ts}</div><div class="rl">Temps</div></div><div class="rst"><div class="rv" style="color:${rc}">${r}</div><div class="rl">Note</div></div><div class="rst"><div class="rv">${G.done.size}/${G.sc.objs.length}</div><div class="rl">Objectifs</div></div><div class="rst"><div class="rv">${G.cc}</div><div class="rl">Commandes</div></div></div><div class="racts"><button onclick="showScreen('select-screen')">Autre scénario</button><button class="pri" onclick="startGame(SC.find(s=>s.id==='${sid}'))">Rejouer ▶</button></div>`;
+showScreen('res-screen')}
+
+function quitGame(){clearInterval(G.iv);showScreen('select-screen')}
+
+// INPUT
+const inp=document.getElementById('tinput');
+inp.addEventListener('keydown',e=>{
+if(e.key==='Enter'){proc(inp.value);inp.value=''}
+else if(e.key==='ArrowUp'){e.preventDefault();if(G.hist.length&&G.hi>0){G.hi--;inp.value=G.hist[G.hi]}}
+else if(e.key==='ArrowDown'){e.preventDefault();if(G.hi<G.hist.length-1){G.hi++;inp.value=G.hist[G.hi]}else{G.hi=G.hist.length;inp.value=''}}
+else if(e.key==='Tab'){e.preventDefault();const p=inp.value.trim();if(p&&G.sc){const a=Object.keys(G.sc.cmds),m=a.find(c=>c.startsWith(p)&&c!==p);if(m)inp.value=m}}
+});
+document.getElementById('game-screen').addEventListener('click',()=>inp.focus());
+renderCards();
+</script>
+</body>
+</html>

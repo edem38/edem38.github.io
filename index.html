@@ -645,9 +645,9 @@
 
         .learn-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -750,6 +750,22 @@
         .terminal-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 30px rgba(34, 197, 94, 0.4);
+        }
+
+        .incident-card:hover {
+            border-color: var(--accent-purple);
+            box-shadow: 0 20px 60px rgba(168, 85, 247, 0.2);
+        }
+
+        .incident-btn {
+            background: linear-gradient(135deg, #ef4444, #f59e0b);
+            color: white;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .incident-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(239, 68, 68, 0.4);
         }
 
         .quiz-btn {
@@ -962,8 +978,8 @@
     <!-- Learn Linux Section -->
     <section id="learn">
         <div class="section-header">
-            <h2>Apprendre <span>Linux</span></h2>
-            <p>Teste tes connaissances et pratique les commandes Linux</p>
+            <h2>Apprendre <span>Linux & DevOps</span></h2>
+            <p>Teste tes connaissances et pratique en conditions réelles</p>
         </div>
         <div class="learn-container">
             <div class="learn-card terminal-card">
@@ -998,6 +1014,23 @@
                 </ul>
                 <a href="linux-quiz.html" class="learn-btn quiz-btn">
                     <span>🎮</span> Lancer le Quiz
+                </a>
+            </div>
+            <div class="learn-card incident-card">
+                <div class="learn-icon">🚨</div>
+                <h3>Incident Simulator</h3>
+                <p>
+                    Entraîne-toi à résoudre des incidents de production en temps réel.
+                    Un terminal, des logs, et un chrono qui tourne !
+                </p>
+                <ul class="learn-features">
+                    <li>🌐 DNS en panne</li>
+                    <li>🗄️ Base de données saturée</li>
+                    <li>💾 Fuite mémoire Node.js</li>
+                    <li>⏱️ Système de score & notation</li>
+                </ul>
+                <a href="incident-simulator.html" class="learn-btn incident-btn">
+                    <span>🔥</span> Lancer le Simulateur
                 </a>
             </div>
         </div>
