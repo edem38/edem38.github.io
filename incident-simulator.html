@@ -3,148 +3,175 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Incident Simulator — DevOps Emergency Training</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+<title>Incident Simulator — DevOps Training</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a0e17;--panel:#111827;--term:#0c1018;--border:#1e293b;--red:#ef4444;--orange:#f59e0b;--green:#22c55e;--blue:#3b82f6;--cyan:#06b6d4;--purple:#a855f7;--txt:#e2e8f0;--dim:#64748b;--termtxt:#4ade80}
+:root{--bg:#080b12;--panel:#0f1420;--card:#151c2a;--term:#0a0e16;--border:#1c2535;--red:#f43f5e;--orange:#f59e0b;--green:#10b981;--blue:#3b82f6;--cyan:#06b6d4;--purple:#8b5cf6;--pink:#ec4899;--txt:#e2e8f0;--dim:#5a6478;--termtxt:#34d399}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
-body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px);pointer-events:none;z-index:9999}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.05) 2px,rgba(0,0,0,.05) 4px);pointer-events:none;z-index:9999}
 .screen{display:none;min-height:100vh}.screen.active{display:flex}
-
-/* MENU */
-#menu-screen{flex-direction:column;align-items:center;justify-content:center;gap:40px;background:radial-gradient(ellipse at 50% 30%,rgba(239,68,68,.08),transparent 60%),var(--bg);position:relative}
-.menu-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(30,41,59,.3) 1px,transparent 1px),linear-gradient(90deg,rgba(30,41,59,.3) 1px,transparent 1px);background-size:60px 60px;animation:grid 20s linear infinite}
-@keyframes grid{to{transform:translate(60px,60px)}}
-.menu-title{text-align:center;z-index:1;animation:up .8s ease-out}
-.menu-title .icon{font-size:64px;display:block;margin-bottom:16px;animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(1.05)}}
-.menu-title h1{font-size:48px;font-weight:900;letter-spacing:-2px;background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase}
-.menu-title .sub{font-family:'JetBrains Mono',monospace;color:var(--dim);font-size:14px;margin-top:12px;letter-spacing:3px;text-transform:uppercase}
-.menu-btns{display:flex;flex-direction:column;gap:12px;z-index:1;animation:up .8s ease-out .2s both}
 @keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.mbtn{background:var(--panel);border:1px solid var(--border);color:var(--txt);font-family:'Outfit',sans-serif;font-size:16px;font-weight:500;padding:16px 48px;border-radius:8px;cursor:pointer;transition:.25s;display:flex;align-items:center;gap:12px}
-.mbtn:hover{border-color:var(--red);box-shadow:0 0 20px rgba(239,68,68,.3);transform:translateY(-2px)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(1.05)}}
+@keyframes grid{to{transform:translate(60px,60px)}}
+@keyframes ap{0%,100%{opacity:1}50%{opacity:.5}}
 
-/* SELECT */
-#select-screen{flex-direction:column;align-items:center;padding:60px 20px;gap:32px;position:relative}
-.back{position:absolute;top:20px;left:20px;background:none;border:1px solid var(--border);color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:13px;padding:8px 16px;border-radius:6px;cursor:pointer;transition:.2s}
+/* ===== MENU ===== */
+#menu{flex-direction:column;align-items:center;justify-content:center;gap:40px;background:radial-gradient(ellipse at 50% 30%,rgba(244,63,94,.06),transparent 60%),var(--bg);position:relative}
+.mbg{position:absolute;inset:0;background-image:linear-gradient(rgba(28,37,53,.4) 1px,transparent 1px),linear-gradient(90deg,rgba(28,37,53,.4) 1px,transparent 1px);background-size:60px 60px;animation:grid 20s linear infinite}
+.mtitle{text-align:center;z-index:1;animation:up .8s ease-out}
+.mtitle .icon{font-size:64px;display:block;margin-bottom:16px;animation:pulse 2s ease-in-out infinite}
+.mtitle h1{font-size:52px;font-weight:900;letter-spacing:-2px;background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase;line-height:1}
+.mtitle .sub{font-family:'IBM Plex Mono',monospace;color:var(--dim);font-size:13px;margin-top:14px;letter-spacing:4px;text-transform:uppercase}
+.mbtns{display:flex;flex-direction:column;gap:12px;z-index:1;animation:up .8s ease-out .2s both}
+.mbtn{background:var(--panel);border:1px solid var(--border);color:var(--txt);font-family:'Outfit',sans-serif;font-size:16px;font-weight:500;padding:16px 52px;border-radius:8px;cursor:pointer;transition:.25s;display:flex;align-items:center;gap:12px}
+.mbtn:hover{border-color:var(--red);box-shadow:0 0 24px rgba(244,63,94,.25);transform:translateY(-2px)}
+
+/* ===== CATEGORY SELECT ===== */
+#catscreen{flex-direction:column;align-items:center;padding:50px 20px;gap:28px;position:relative}
+.back{position:absolute;top:20px;left:20px;background:none;border:1px solid var(--border);color:var(--dim);font-family:'IBM Plex Mono',monospace;font-size:13px;padding:8px 16px;border-radius:6px;cursor:pointer;transition:.2s}
 .back:hover{color:var(--txt);border-color:var(--dim)}
-#select-screen h2{font-size:32px;font-weight:700}
-.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;max-width:1000px;width:100%}
-.scard{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:24px;cursor:pointer;transition:.3s;position:relative;overflow:hidden}
-.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--orange));opacity:0;transition:.3s}
-.scard:hover{border-color:var(--red);transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,.4)}
-.scard:hover::before{opacity:1}
-.scard .ci{font-size:32px;margin-bottom:12px}
-.scard h3{font-size:18px;font-weight:700;margin-bottom:8px}
-.scard p{font-size:14px;color:var(--dim);line-height:1.5;margin-bottom:16px}
-.cmeta{display:flex;gap:12px;font-family:'JetBrains Mono',monospace;font-size:11px}
-.ctag{padding:4px 10px;border-radius:99px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.teasy{background:rgba(34,197,94,.15);color:var(--green)}
-.tmed{background:rgba(245,158,11,.15);color:var(--orange)}
-.thard{background:rgba(239,68,68,.15);color:var(--red)}
+#catscreen h2{font-size:30px;font-weight:700}
+.catgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:1100px;width:100%}
+.catcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;cursor:pointer;transition:.3s;position:relative;overflow:hidden;text-align:center}
+.catcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:.3s}
+.catcard:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(0,0,0,.5)}
+.catcard:hover::before{opacity:1}
+.catcard .ci{font-size:40px;margin-bottom:12px;display:block}
+.catcard h3{font-size:17px;font-weight:700;margin-bottom:6px}
+.catcard .ccount{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim)}
+.cat-linux:hover{border-color:var(--green)}.cat-linux::before{background:var(--green)}
+.cat-docker:hover{border-color:var(--blue)}.cat-docker::before{background:var(--blue)}
+.cat-k8s:hover{border-color:var(--purple)}.cat-k8s::before{background:var(--purple)}
+.cat-db:hover{border-color:var(--orange)}.cat-db::before{background:var(--orange)}
+.cat-sec:hover{border-color:var(--red)}.cat-sec::before{background:var(--red)}
+.cat-cicd:hover{border-color:var(--cyan)}.cat-cicd::before{background:var(--cyan)}
 
-/* TUTORIAL */
-#tut-screen{flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:32px;position:relative}
+/* ===== SCENARIO SELECT ===== */
+#selscreen{flex-direction:column;align-items:center;padding:50px 20px;gap:24px;position:relative}
+#selscreen h2{font-size:28px;font-weight:700;display:flex;align-items:center;gap:12px}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;max-width:1000px;width:100%}
+.scard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;cursor:pointer;transition:.3s;position:relative;overflow:hidden}
+.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--orange));opacity:0;transition:.3s}
+.scard:hover{border-color:var(--red);transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.scard:hover::before{opacity:1}
+.scard h3{font-size:16px;font-weight:700;margin-bottom:6px}
+.scard p{font-size:13px;color:var(--dim);line-height:1.5;margin-bottom:14px}
+.cmeta{display:flex;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:11px}
+.ctag{padding:3px 10px;border-radius:99px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.teasy{background:rgba(16,185,129,.15);color:var(--green)}
+.tmed{background:rgba(245,158,11,.15);color:var(--orange)}
+.thard{background:rgba(244,63,94,.15);color:var(--red)}
+
+/* ===== TUTORIAL ===== */
+#tut{flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:32px;position:relative}
 .tbox{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:40px;max-width:700px;width:100%;animation:up .5s ease-out}
-.tbox h2{font-size:28px;font-weight:700;margin-bottom:8px}
-.tbox .step{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:24px;text-transform:uppercase;letter-spacing:2px}
-.tbox p{font-size:16px;line-height:1.7;color:var(--dim);margin-bottom:16px}
-.tbox code{font-family:'JetBrains Mono',monospace;background:var(--term);color:var(--termtxt);padding:3px 8px;border-radius:4px;font-size:14px}
-.tbox .ex{background:var(--term);border:1px solid var(--border);border-radius:8px;padding:16px;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--termtxt);line-height:1.8}
-.tnav{display:flex;gap:12px;margin-top:24px}
+.tbox h2{font-size:26px;font-weight:700;margin-bottom:8px}
+.tbox .step{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);margin-bottom:20px;text-transform:uppercase;letter-spacing:2px}
+.tbox p{font-size:15px;line-height:1.7;color:var(--dim);margin-bottom:14px}
+.tbox code{font-family:'IBM Plex Mono',monospace;background:var(--term);color:var(--termtxt);padding:3px 8px;border-radius:4px;font-size:13px}
+.tbox .ex{background:var(--term);border:1px solid var(--border);border-radius:8px;padding:14px;margin:14px 0;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--termtxt);line-height:1.8}
+.tnav{display:flex;gap:12px;margin-top:20px}
 .tbtn{flex:1;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:.2s}
 .tbtn:hover{border-color:var(--blue)}
-.tbtn.pri{background:linear-gradient(135deg,var(--red),var(--orange));border:none;font-weight:700}
+.tbtn.pri{background:linear-gradient(135deg,var(--red),var(--orange));border:none;font-weight:700;color:#fff}
 .tbtn.pri:hover{opacity:.9}
 
-/* GAME */
-#game-screen{flex-direction:column;height:100vh}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--panel);border-bottom:1px solid var(--border);flex-shrink:0}
-.tbl{display:flex;align-items:center;gap:16px}
-.badge{display:flex;align-items:center;gap:8px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);padding:6px 14px;border-radius:99px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--red);animation:ap 1.5s ease-in-out infinite}
-@keyframes ap{0%,100%{opacity:1}50%{opacity:.6}}
-.badge.ok{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:var(--green);animation:none}
-.sname{font-weight:700;font-size:15px}
-.tbr{display:flex;align-items:center;gap:20px}
-.timer{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--orange);letter-spacing:2px}
-.qbtn{background:none;border:1px solid var(--border);color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 14px;border-radius:6px;cursor:pointer;transition:.2s}
+/* ===== GAME ===== */
+#game{flex-direction:column;height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:var(--panel);border-bottom:1px solid var(--border);flex-shrink:0}
+.tbl{display:flex;align-items:center;gap:14px}
+.badge{display:flex;align-items:center;gap:8px;background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.3);padding:5px 14px;border-radius:99px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--red);animation:ap 1.5s ease-in-out infinite}
+.badge.ok{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);color:var(--green);animation:none}
+.sname{font-weight:700;font-size:14px}
+.tbr{display:flex;align-items:center;gap:18px}
+.timer{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:700;color:var(--orange);letter-spacing:2px}
+.qbtn{background:none;border:1px solid var(--border);color:var(--dim);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:5px 12px;border-radius:6px;cursor:pointer;transition:.2s}
 .qbtn:hover{border-color:var(--red);color:var(--red)}
-.glayout{display:grid;grid-template-columns:280px 1fr;flex:1;overflow:hidden}
+.glayout{display:grid;grid-template-columns:260px 1fr;flex:1;overflow:hidden}
 .side{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
-.psec{padding:16px;border-bottom:1px solid var(--border)}
-.psec h4{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:12px}
-.met{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:13px}
-.ml{color:var(--dim)}.mv{font-family:'JetBrains Mono',monospace;font-weight:700}
-.mbar{width:100%;height:6px;background:var(--bg);border-radius:3px;margin-top:4px;overflow:hidden}
+.psec{padding:14px;border-bottom:1px solid var(--border)}
+.psec h4{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--dim);margin-bottom:10px}
+.met{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px}
+.ml{color:var(--dim)}.mv{font-family:'IBM Plex Mono',monospace;font-weight:700}
+.mbar{width:100%;height:5px;background:var(--bg);border-radius:3px;margin-top:3px;overflow:hidden}
 .mfill{height:100%;border-radius:3px;transition:.5s}
-.olist{list-style:none;display:flex;flex-direction:column;gap:8px}
-.obj{font-size:13px;color:var(--dim);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
-.obj .ck{flex-shrink:0;width:18px;height:18px;border:2px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:1px}
+.olist{list-style:none;display:flex;flex-direction:column;gap:6px}
+.obj{font-size:12px;color:var(--dim);display:flex;align-items:flex-start;gap:7px;line-height:1.4}
+.obj .ck{flex-shrink:0;width:16px;height:16px;border:2px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;margin-top:1px}
 .obj.done .ck{background:var(--green);border-color:var(--green);color:#000}
 .obj.done{color:var(--green);text-decoration:line-through}
-.logs{flex:1;overflow-y:auto;padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;color:var(--dim)}
+.logs{flex:1;overflow-y:auto;padding:10px 14px;font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.6;color:var(--dim)}
 .le{margin-bottom:2px}.le .lt{color:var(--dim)}.le.error{color:var(--red)}.le.warn{color:var(--orange)}.le.info{color:var(--cyan)}.le.success{color:var(--green)}
-
 .tarea{display:flex;flex-direction:column;overflow:hidden;background:var(--term)}
-.thead{display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(0,0,0,.3);border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim)}
+.thead{display:flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(0,0,0,.3);border-bottom:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim)}
 .dots{display:flex;gap:6px}.dots span{width:10px;height:10px;border-radius:50%}.dots span:nth-child(1){background:var(--red)}.dots span:nth-child(2){background:var(--orange)}.dots span:nth-child(3){background:var(--green)}
-.tout{flex:1;overflow-y:auto;padding:16px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;color:var(--termtxt)}
+.tout{flex:1;overflow-y:auto;padding:14px;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.7;color:var(--termtxt)}
 .tout .ol{margin-bottom:2px;white-space:pre-wrap;word-break:break-all}
 .tout .ol.o-error{color:var(--red)}.tout .ol.o-warn{color:var(--orange)}.tout .ol.o-info{color:var(--cyan)}.tout .ol.o-success{color:var(--green)}.tout .ol.o-system{color:var(--purple)}
-.hbar{padding:8px 16px;background:rgba(59,130,246,.08);border-top:1px solid rgba(59,130,246,.2);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);display:flex;align-items:center;gap:8px}
-.hbar .hk{background:rgba(59,130,246,.2);padding:2px 6px;border-radius:3px;font-weight:700}
-.tinl{display:flex;align-items:center;padding:12px 16px;border-top:1px solid var(--border);background:rgba(0,0,0,.2);gap:8px}
-.pp{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--cyan);flex-shrink:0;white-space:nowrap}
-.tinput{flex:1;background:none;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--termtxt);caret-color:var(--termtxt)}
+.hbar{padding:7px 16px;background:rgba(59,130,246,.06);border-top:1px solid rgba(59,130,246,.15);font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.hbar .hk{background:rgba(59,130,246,.15);padding:2px 6px;border-radius:3px;font-weight:700}
+.tinl{display:flex;align-items:center;padding:10px 16px;border-top:1px solid var(--border);background:rgba(0,0,0,.2);gap:8px}
+.pp{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--cyan);flex-shrink:0}
+.tinput{flex:1;background:none;border:none;outline:none;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--termtxt);caret-color:var(--termtxt)}
 
-/* RESULT */
-#res-screen{flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:40px 20px}
-.rbox{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:48px;text-align:center;max-width:500px;width:100%;animation:up .6s ease-out}
-.ricon{font-size:64px;margin-bottom:16px}
-.rbox h2{font-size:32px;font-weight:900;margin-bottom:8px}
-.rbox .rsub{color:var(--dim);font-size:15px;margin-bottom:32px}
-.rstats{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
-.rst{background:var(--bg);padding:16px;border-radius:8px}
-.rst .rv{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:var(--cyan)}
-.rst .rl{font-size:12px;color:var(--dim);margin-top:4px}
+/* ===== RESULT ===== */
+#res{flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:40px 20px}
+.rbox{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:44px;text-align:center;max-width:500px;width:100%;animation:up .6s ease-out}
+.ricon{font-size:60px;margin-bottom:14px}
+.rbox h2{font-size:30px;font-weight:900;margin-bottom:6px}
+.rbox .rsub{color:var(--dim);font-size:14px;margin-bottom:28px}
+.rstats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px}
+.rst{background:var(--bg);padding:14px;border-radius:8px}
+.rst .rv{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;color:var(--cyan)}
+.rst .rl{font-size:11px;color:var(--dim);margin-top:4px}
 .racts{display:flex;gap:12px}
-.racts button{flex:1;padding:14px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:.2s;border:1px solid var(--border);background:var(--bg);color:var(--txt)}
+.racts button{flex:1;padding:12px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;border:1px solid var(--border);background:var(--bg);color:var(--txt)}
 .racts button:hover{border-color:var(--blue)}
-.racts button.pri{background:linear-gradient(135deg,var(--red),var(--orange));border:none}
+.racts button.pri{background:linear-gradient(135deg,var(--red),var(--orange));border:none;color:#fff}
 
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-@media(max-width:768px){.glayout{grid-template-columns:1fr;grid-template-rows:auto 1fr}.side{border-right:none;border-bottom:1px solid var(--border);max-height:200px;overflow-y:auto}.menu-title h1{font-size:32px}.sgrid{grid-template-columns:1fr}}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+@media(max-width:768px){.glayout{grid-template-columns:1fr;grid-template-rows:auto 1fr}.side{border-right:none;border-bottom:1px solid var(--border);max-height:180px;overflow-y:auto}.mtitle h1{font-size:34px}.catgrid,.sgrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<div id="menu-screen" class="screen active">
-  <div class="menu-bg"></div>
-  <div class="menu-title">
+<!-- MENU -->
+<div id="menu" class="screen active">
+  <div class="mbg"></div>
+  <div class="mtitle">
     <span class="icon">🚨</span>
     <h1>Incident<br>Simulator</h1>
     <div class="sub">DevOps Emergency Training</div>
   </div>
-  <div class="menu-btns">
-    <button class="mbtn" onclick="showScreen('select-screen')"><span>▶</span> Jouer</button>
+  <div class="mbtns">
+    <button class="mbtn" onclick="showScreen('catscreen')"><span>▶</span> Jouer</button>
     <button class="mbtn" onclick="startTut()"><span>📖</span> Tutoriel</button>
   </div>
 </div>
 
-<div id="select-screen" class="screen">
-  <button class="back" onclick="showScreen('menu-screen')">← Retour</button>
-  <h2>Choisir un incident</h2>
+<!-- CATEGORY SELECT -->
+<div id="catscreen" class="screen">
+  <button class="back" onclick="showScreen('menu')">← Retour</button>
+  <h2>Choisir une catégorie</h2>
+  <div class="catgrid" id="catgrid"></div>
+</div>
+
+<!-- SCENARIO SELECT -->
+<div id="selscreen" class="screen">
+  <button class="back" onclick="showScreen('catscreen')">← Retour</button>
+  <h2 id="selTitle"></h2>
   <div class="sgrid" id="sgrid"></div>
 </div>
 
-<div id="tut-screen" class="screen">
-  <button class="back" onclick="showScreen('menu-screen')">← Retour</button>
+<!-- TUTORIAL -->
+<div id="tut" class="screen">
+  <button class="back" onclick="showScreen('menu')">← Retour</button>
   <div class="tbox" id="tbox"></div>
 </div>
 
-<div id="game-screen" class="screen">
+<!-- GAME -->
+<div id="game" class="screen">
   <div class="topbar">
     <div class="tbl">
       <div class="badge" id="badge"><span>●</span> INCIDENT EN COURS</div>
@@ -162,180 +189,952 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
       <div class="logs" id="lpanel"></div>
     </div>
     <div class="tarea">
-      <div class="thead"><div class="dots"><span></span><span></span><span></span></div><span>ops@server ~ $</span></div>
+      <div class="thead"><div class="dots"><span></span><span></span><span></span></div><span id="promptLabel">ops@server ~ $</span></div>
       <div class="tout" id="tout"></div>
-      <div class="hbar"><span class="hk">TAB</span> complétion <span style="margin-left:12px" class="hk">↑↓</span> historique <span style="margin-left:12px" class="hk">help</span> commandes</div>
-      <div class="tinl"><span class="pp">ops@server:~$</span><input type="text" class="tinput" id="tinput" autocomplete="off" spellcheck="false" autofocus></div>
+      <div class="hbar"><span class="hk">TAB</span> complétion <span style="margin-left:10px" class="hk">↑↓</span> historique <span style="margin-left:10px" class="hk">help</span> commandes</div>
+      <div class="tinl"><span class="pp" id="promptStr">ops@server:~$</span><input type="text" class="tinput" id="tinput" autocomplete="off" spellcheck="false" autofocus></div>
     </div>
   </div>
 </div>
 
-<div id="res-screen" class="screen">
+<!-- RESULT -->
+<div id="res" class="screen">
   <div class="rbox" id="rbox"></div>
 </div>
-
 <script>
 // ============================================================
-// SCENARIOS
+// CATEGORIES
 // ============================================================
-const SC=[
-{id:'dns',icon:'🌐',title:'DNS en panne',desc:'Les utilisateurs ne peuvent plus accéder au site. Erreurs de résolution DNS massives.',diff:'easy',dl:'Facile',
-metrics:{'Uptime':{v:0,max:100,u:'%'},'Requêtes échouées':{v:847,max:1000,u:'/min'},'Utilisateurs impactés':{v:12400,max:15000,u:''}},
-objs:[{id:'diag',t:'Diagnostiquer le problème DNS'},{id:'find',t:'Identifier la cause root'},{id:'fix',t:'Réparer la configuration DNS'},{id:'verify',t:'Vérifier la résolution'}],
-initLogs:[{c:'error',m:'ALERT: DNS resolution failures — api.company.com'},{c:'error',m:'ALERT: 503 errors spiking on LB'},{c:'warn',m:'85% health checks failing'},{c:'info',m:'On-call notified via PagerDuty'}],
-initOut:[{t:'🚨 INCIDENT ALERT — Severity: P1',c:'system'},{t:'Utilisateurs: erreurs "Site inaccessible".',c:'system'},{t:'Monitoring: failures DNS massifs.',c:'system'},{t:'',c:''},{t:'Tapez "help" pour les commandes.',c:'info'}],
-cmds:{
-'help':{out:[{t:'=== COMMANDES DISPONIBLES ===',c:'info'},{t:'dig <domain>          — Requête DNS',c:''},{t:'nslookup <domain>     — Résolution DNS',c:''},{t:'cat /etc/resolv.conf  — Config DNS',c:''},{t:'systemctl status named — Status service DNS',c:''},{t:'systemctl restart named — Redémarrer DNS',c:''},{t:'journalctl -u named    — Logs service DNS',c:''},{t:'cat /etc/named.conf    — Config BIND',c:''},{t:'nano /etc/named.conf   — Éditer config',c:''},{t:'named-checkconf        — Valider config',c:''},{t:'ping <host>            — Connectivité',c:''},{t:'curl <url>             — Test HTTP',c:''},{t:'hint                   — Indice',c:''}]},
-'dig api.company.com':{out:[{t:'; <<>> DiG 9.18.1 <<>> api.company.com',c:''},{t:';; connection timed out; no servers could be reached',c:''},{t:';; SERVFAIL — no response from nameserver',c:'error'}],trig:['diag']},
-'nslookup api.company.com':{out:[{t:'Server:    10.0.0.2',c:''},{t:'Address:   10.0.0.2#53',c:''},{t:"** server can't find api.company.com: SERVFAIL",c:'error'}],trig:['diag']},
-'ping api.company.com':{out:[{t:'ping: api.company.com: Temporary failure in name resolution',c:'error'}]},
-'cat /etc/resolv.conf':{out:[{t:'# Generated by NetworkManager',c:''},{t:'nameserver 10.0.0.2',c:''},{t:'nameserver 8.8.8.8',c:''}]},
-'systemctl status named':{out:[{t:'● named.service - BIND Domain Name Server',c:''},{t:'   Loaded: loaded',c:''},{t:'   Active: active (running) but DEGRADED',c:'error'},{t:'   Warning: configuration file has errors',c:'warn'}],trig:['diag']},
-'journalctl -u named':{out:[{t:'Feb 11 03:42:01 named: loading configuration...',c:''},{t:'Feb 11 03:42:01 named: zone company.com/IN: loading failed',c:'error'},{t:'Feb 11 03:42:01 named: /etc/named.conf:24: missing semicolon',c:'error'},{t:'Feb 11 03:42:02 named: running with degraded configuration',c:'warn'}],trig:['find'],log:{c:'warn',m:'Root cause: erreur syntaxe named.conf ligne 24'}},
-'cat /etc/named.conf':{out:[{t:'// BIND configuration',c:''},{t:'options {',c:''},{t:'    directory "/var/named";',c:''},{t:'    listen-on port 53 { any; };',c:''},{t:'};',c:''},{t:'',c:''},{t:'zone "company.com" IN {',c:''},{t:'    type master;',c:''},{t:'    file "company.com.zone"    ← POINT-VIRGULE MANQUANT !',c:'error'},{t:'};',c:''}],trig:['find']},
-'named-checkconf':{out:[{t:"/etc/named.conf:24: missing ';' before end of line",c:'error'},{t:'configuration check failed',c:'error'}],trig:['find']},
-'nano /etc/named.conf':{out:[{t:'[nano] Ouverture de /etc/named.conf...',c:'success'},{t:'Correction: ajout du point-virgule manquant ligne 24',c:'info'},{t:'[nano] Fichier sauvegardé.',c:'success'}],trig:['fix'],log:{c:'success',m:'Config DNS corrigée'}},
-'vim /etc/named.conf':{out:[{t:'[vim] Correction: point-virgule ajouté ligne 24',c:'success'},{t:'[vim] Sauvegardé.',c:'success'}],trig:['fix'],log:{c:'success',m:'Config DNS corrigée'}},
-'systemctl restart named':{out:[{t:'Restarting BIND DNS Server...',c:'info'},{t:'● named.service — Active: active (running) — fully operational',c:'success'},{t:'All zones loaded successfully.',c:'success'}],trig:['fix'],log:{c:'success',m:'Service DNS redémarré'},mu:{'Uptime':99.9,'Requêtes échouées':2,'Utilisateurs impactés':0}},
-'hint':{out:[{t:'💡 INDICE:',c:'info'},{t:'1. Diagnostiquez: dig, nslookup, systemctl status',c:''},{t:'2. Cause: journalctl -u named',c:''},{t:'3. Inspectez: cat /etc/named.conf',c:''},{t:'4. Corrigez: nano + systemctl restart',c:''}]}
-},
-postCmds:{
-'dig api.company.com':{out:[{t:'; <<>> DiG 9.18.1 <<>> api.company.com',c:''},{t:';; ANSWER SECTION:',c:''},{t:'api.company.com.  300  IN  A  10.0.1.50',c:'success'}],trig:['verify']},
-'nslookup api.company.com':{out:[{t:'Name:  api.company.com',c:'success'},{t:'Address: 10.0.1.50',c:'success'}],trig:['verify']},
-'curl api.company.com':{out:[{t:'HTTP/1.1 200 OK',c:'success'},{t:'{"status":"healthy"}',c:'success'}],trig:['verify']},
-'ping api.company.com':{out:[{t:'64 bytes from 10.0.1.50: icmp_seq=1 ttl=64 time=0.45ms',c:'success'}],trig:['verify']}
-}},
-
-{id:'db',icon:'🗄️',title:'Base de données saturée',desc:"L'API est extrêmement lente. PostgreSQL saturé avec connexions bloquées.",diff:'medium',dl:'Moyen',
-metrics:{'Temps réponse':{v:12000,max:15000,u:'ms'},'Connexions DB':{v:98,max:100,u:'/100'},'CPU DB':{v:97,max:100,u:'%'}},
-objs:[{id:'diag',t:'Diagnostiquer la surcharge DB'},{id:'find',t:'Trouver la requête problématique'},{id:'kill',t:'Terminer les requêtes bloquantes'},{id:'fix',t:"Ajouter l'index manquant"},{id:'verify',t:'Vérifier le retour à la normale'}],
-initLogs:[{c:'error',m:'ALERT: API response time > 10s'},{c:'error',m:'ALERT: PostgreSQL 98/100 connexions'},{c:'warn',m:'CPU spike on db-primary-01'},{c:'info',m:'On-call notified'}],
-initOut:[{t:'🚨 INCIDENT ALERT — Severity: P1',c:'system'},{t:"L'API est extrêmement lente (>10s).",c:'system'},{t:'PostgreSQL semble saturé.',c:'system'},{t:'',c:''},{t:'Tapez "help" pour les commandes.',c:'info'}],
-cmds:{
-'help':{out:[{t:'=== COMMANDES DISPONIBLES ===',c:'info'},{t:'psql                    — Connecter PostgreSQL',c:''},{t:'pg_stat                 — Stats connexions',c:''},{t:'pg_locks                — Verrous actifs',c:''},{t:'pg_slow_queries         — Requêtes lentes',c:''},{t:'pg_kill <pid>           — Terminer requête',c:''},{t:'pg_kill_slow            — Terminer toutes lentes',c:''},{t:'explain_query           — Analyser requête',c:''},{t:'create_index            — Créer index manquant',c:''},{t:'top                     — Processus système',c:''},{t:'curl api.company.com/health — Health check',c:''},{t:'hint                    — Indice',c:''}]},
-'top':{out:[{t:'load average: 18.72, 16.45, 12.30',c:''},{t:'%Cpu: 97.2% us',c:'error'},{t:'PID 3842 postgres 45.2% — SELECT waiting',c:'error'},{t:'PID 3901 postgres 28.7% — SELECT waiting',c:'error'}],trig:['diag']},
-'psql':{out:[{t:'psql (15.4) — Connected to "production"',c:'success'},{t:'WARNING: 98 of 100 connections in use',c:'warn'}],trig:['diag']},
-'pg_stat':{out:[{t:'=== CONNEXIONS POSTGRESQL ===',c:'info'},{t:'Total: 98/100',c:''},{t:'Active: 47  |  Waiting: 38  |  Idle in tx: 13',c:'error'},{t:'Longest query: 847 seconds',c:'error'},{t:'Avg query time: 23.4s (normal: 50ms)',c:'warn'}],trig:['diag']},
-'pg_locks':{out:[{t:'=== VERROUS ACTIFS ===',c:'info'},{t:'PID 3842: ExclusiveLock on "orders" — 847s',c:'error'},{t:'   ↳ 38 queries WAITING',c:'error'}],trig:['find']},
-'pg_slow_queries':{out:[{t:'=== REQUÊTES LENTES (>5s) ===',c:'info'},{t:'',c:''},{t:'PID 3842 | 847s | SELECT * FROM orders',c:'error'},{t:"  WHERE created_at > '2025-01-01' AND status = 'pending'",c:'error'},{t:'  → Seq Scan on orders (2.4M rows!) — NO INDEX',c:'error'},{t:'',c:''},{t:'38 additional queries blocked by PID 3842',c:'warn'}],trig:['find'],log:{c:'warn',m:'Root cause: full scan "orders" 2.4M rows, pas d\'index'}},
-'explain_query':{out:[{t:'Seq Scan on orders (cost=0..185432 rows=2400000)',c:'error'},{t:'  Rows Removed by Filter: 2,156,000',c:'error'},{t:'  Execution Time: STILL RUNNING...',c:'error'},{t:'⚠ Aucun index sur (created_at, status)',c:'warn'}],trig:['find']},
-'pg_kill 3842':{out:[{t:'Sending SIGTERM to PID 3842...',c:'info'},{t:'Query terminated. 38 waiting queries released.',c:'success'}],trig:['kill'],log:{c:'success',m:'PID 3842 terminé'},mu:{'Connexions DB':52,'CPU DB':65}},
-'pg_kill_slow':{out:[{t:'Terminating all slow queries...',c:'info'},{t:'PID 3842, 3901, 3955 terminated.',c:'success'},{t:'38 blocked queries released.',c:'success'}],trig:['kill'],log:{c:'success',m:'Requêtes lentes terminées'},mu:{'Connexions DB':12,'CPU DB':35}},
-'create_index':{out:[{t:'CREATE INDEX CONCURRENTLY idx_orders_created_status',c:'info'},{t:'  ON orders (created_at, status);',c:'info'},{t:'Building index... ████████████████████ 100%',c:''},{t:'INDEX CREATED SUCCESSFULLY',c:'success'},{t:'Before: Seq Scan ~850s → After: Index Scan ~45ms',c:'success'}],trig:['fix'],log:{c:'success',m:'Index créé'},mu:{'Temps réponse':48,'Connexions DB':8,'CPU DB':12}},
-'hint':{out:[{t:'💡 INDICE:',c:'info'},{t:'1. Diagnostiquez: top, pg_stat',c:''},{t:'2. Cause: pg_slow_queries, pg_locks',c:''},{t:'3. Libérez: pg_kill_slow',c:''},{t:'4. Corrigez: create_index',c:''},{t:'5. Vérifiez: curl api.company.com/health',c:''}]}
-},
-postCmds:{
-'curl api.company.com/health':{out:[{t:'HTTP/1.1 200 OK',c:'success'},{t:'{"status":"healthy","db_time":"45ms","conn":"8/100"}',c:'success'}],trig:['verify']},
-'pg_stat':{out:[{t:'Total: 8/100 | Active: 3 | Waiting: 0',c:'success'},{t:'Avg query time: 45ms ✓',c:'success'}],trig:['verify']},
-'top':{out:[{t:'load average: 1.20, 4.52, 8.30',c:''},{t:'%Cpu: 12.1% us — 85.5% idle',c:'success'}],trig:['verify']}
-}},
-
-{id:'mem',icon:'💾',title:'Fuite mémoire',desc:'Le serveur Node.js consomme de plus en plus de RAM. OOM killer imminent.',diff:'medium',dl:'Moyen',
-metrics:{'RAM':{v:93,max:100,u:'%'},'Heap Node.js':{v:1840,max:2048,u:'MB'},'Uptime API':{v:100,max:100,u:'%'}},
-objs:[{id:'diag',t:"Diagnostiquer l'utilisation mémoire"},{id:'find',t:'Identifier la fuite mémoire'},{id:'fix',t:'Déployer le hotfix'},{id:'verify',t:'Vérifier la stabilisation'}],
-initLogs:[{c:'error',m:'ALERT: Memory > 90% on app-server-01'},{c:'warn',m:'OOM killer may trigger soon'},{c:'warn',m:'Heap growing 50MB/min'},{c:'info',m:'On-call notified'}],
-initOut:[{t:'🚨 INCIDENT ALERT — Severity: P2',c:'system'},{t:'app-server-01: 93% RAM.',c:'system'},{t:'Heap Node.js anormalement élevé.',c:'system'},{t:'',c:''},{t:'Tapez "help" pour les commandes.',c:'info'}],
-cmds:{
-'help':{out:[{t:'=== COMMANDES DISPONIBLES ===',c:'info'},{t:'free -h              — Mémoire système',c:''},{t:'top                  — Processus',c:''},{t:'node_heap            — Stats heap Node.js',c:''},{t:'node_heapdump        — Snapshot heap',c:''},{t:'analyze_heap         — Analyser heap dump',c:''},{t:'cat /app/server.js   — Code source',c:''},{t:'git log --oneline    — Derniers commits',c:''},{t:'git diff HEAD~1      — Diff dernier commit',c:''},{t:'git revert HEAD      — Reverter commit',c:''},{t:"pm2 restart app      — Redémarrer l'app",c:''},{t:'pm2 status           — Status app',c:''},{t:'hint                 — Indice',c:''}]},
-'free -h':{out:[{t:'              total    used    free',c:''},{t:'Mem:          8.0Gi   7.4Gi   0.2Gi',c:'error'},{t:'Swap:         2.0Gi   1.8Gi   0.2Gi',c:''}],trig:['diag']},
-'top':{out:[{t:'%Cpu: 34.2% — %Mem: 93.2%',c:'error'},{t:'PID 2201 node 34.1% 89.2% 1840MB node /app/server.js',c:'error'},{t:'PID 1105 root  2.1%  1.2%   96MB nginx',c:''}],trig:['diag']},
-'node_heap':{out:[{t:'=== NODE.JS HEAP ===',c:'info'},{t:'Used: 1,840 MB / 2,048 MB (89.8%)',c:'error'},{t:'Growth: +52 MB/min (ABNORMAL)',c:'warn'},{t:'GC Reclaimed: only 2% per cycle',c:'warn'},{t:'⚠ Memory leak detected',c:'error'}],trig:['diag']},
-'node_heapdump':{out:[{t:'Snapshot saved: /tmp/heapdump.json (248MB)',c:'info'},{t:'Use "analyze_heap" to examine.',c:'info'}]},
-'analyze_heap':{out:[{t:'=== HEAP ANALYSIS ===',c:'info'},{t:'',c:''},{t:'TOP RETAINED OBJECTS:',c:'error'},{t:'1. Array (requestCache) — 1,247 MB (67.8%)',c:'error'},{t:'   → 2,847,000 objects, NEVER evicted',c:'error'},{t:'2. Map (sessions) — 312 MB',c:''},{t:'',c:''},{t:'⚠ "requestCache" grows indefinitely!',c:'warn'},{t:'💡 Vérifiez: cat /app/server.js ou git log',c:'info'}],trig:['find'],log:{c:'warn',m:'Heap: requestCache = 1.2GB, croissance infinie'}},
-'cat /app/server.js':{out:[{t:'const express = require("express");',c:''},{t:'const app = express();',c:''},{t:'',c:''},{t:'// BUG: cache sans limite !',c:'error'},{t:'const requestCache = [];',c:'error'},{t:'',c:''},{t:'app.get("/api/data", (req, res) => {',c:''},{t:'  requestCache.push({ query: req.query, result: data, ts: Date.now() });',c:'error'},{t:'  // ⚠ Pas de limite, pas de nettoyage !',c:'warn'},{t:'  res.json(data);',c:''},{t:'});',c:''}],trig:['find']},
-'git log --oneline':{out:[{t:'a3f8b2c (HEAD) feat: add request caching',c:'error'},{t:'7d1e4a9 fix: update rate limiter',c:''},{t:'b29c6f1 chore: update dependencies',c:''}],trig:['find']},
-'git diff HEAD~1':{out:[{t:'commit a3f8b2c — "feat: add request caching"',c:'info'},{t:'+ const requestCache = [];',c:'error'},{t:'+ requestCache.push({ query, result, ts });',c:'error'},{t:'  // Aucune éviction !',c:'warn'}],trig:['find'],log:{c:'warn',m:'Cause: commit a3f8b2c — cache sans éviction'}},
-'git revert HEAD':{out:[{t:'Reverting commit a3f8b2c...',c:'info'},{t:'[main c4b9a1d] Revert "feat: add request caching"',c:'success'},{t:'Utilisez "pm2 restart app" pour appliquer.',c:'info'}],trig:['fix'],log:{c:'success',m:'Commit a3f8b2c reverté'}},
-'pm2 restart app':{out:[{t:'Restarting app...',c:'info'},{t:'[PM2] app ✓ restarted',c:'success'},{t:'│ app │ online │ 2.1% │ 128MB │',c:'success'}],trig:['fix'],log:{c:'success',m:'App redémarrée — heap libéré'},mu:{'RAM':22,'Heap Node.js':128}},
-'hint':{out:[{t:'💡 INDICE:',c:'info'},{t:'1. Diagnostiquez: free -h, top, node_heap',c:''},{t:'2. Analysez: node_heapdump + analyze_heap',c:''},{t:'3. Code: cat /app/server.js ou git diff',c:''},{t:'4. Fix: git revert HEAD + pm2 restart app',c:''},{t:'5. Vérifiez: free -h, node_heap',c:''}]}
-},
-postCmds:{
-'free -h':{out:[{t:'Mem:          8.0Gi   1.8Gi   5.4Gi',c:'success'},{t:'Swap:         2.0Gi   0.0Gi   2.0Gi',c:''}],trig:['verify']},
-'node_heap':{out:[{t:'Used: 128 MB / 2,048 MB (6.3%)',c:'success'},{t:'Growth: stable (±2 MB/min)',c:'success'},{t:'GC Reclaimed: 38% per cycle ✓',c:'success'}],trig:['verify']},
-'pm2 status':{out:[{t:'│ app │ online │ 2.1% │ 131MB │ 2m │',c:'success'}],trig:['verify']},
-'top':{out:[{t:'%Cpu: 5.1% — %Mem: 22.5%',c:'success'},{t:'PID 4102 node 2.1% 1.6% 131MB',c:'success'}],trig:['verify']}
-}}
+const CATS=[
+{id:'linux',icon:'🐧',name:'Linux / Système / RHEL',css:'cat-linux',count:8},
+{id:'docker',icon:'🐳',name:'Docker',css:'cat-docker',count:5},
+{id:'k8s',icon:'☸️',name:'Kubernetes',css:'cat-k8s',count:5},
+{id:'db',icon:'🗄️',name:'Bases de données',css:'cat-db',count:4},
+{id:'sec',icon:'🔒',name:'Sécurité',css:'cat-sec',count:4},
+{id:'cicd',icon:'⚙️',name:'CI/CD & Ansible',css:'cat-cicd',count:3}
 ];
+
+// ============================================================
+// SCENARIO BUILDER HELPER
+// ============================================================
+function S(id,cat,title,desc,diff,dl,metrics,objs,initLogs,initOut,cmds,postCmds){
+return{id,cat,title,desc,diff,dl,metrics,objs,initLogs,initOut,cmds,postCmds};
+}
+function O(id,t){return{id,t}}
+function L(c,m){return{c,m}}
+function T(t,c){return{t:t||'',c:c||''}}
+
+const SC=[];
+
+// ============================================================
+// LINUX 1: DNS en panne
+// ============================================================
+SC.push(S('dns','linux','DNS qui ne résout plus','Le site est inaccessible, erreurs de résolution DNS massives.','easy','Facile',
+{'Uptime':{v:0,max:100,u:'%'},'Req. échouées':{v:847,max:1000,u:'/min'},'Users impactés':{v:12400,max:15000,u:''}},
+[O('diag','Diagnostiquer le problème DNS'),O('find','Identifier la cause root'),O('fix','Corriger la configuration'),O('verify','Vérifier la résolution')],
+[L('error','ALERT: DNS resolution failures — api.company.com'),L('error','503 errors spiking'),L('warn','85% health checks failing'),L('info','On-call notified')],
+[T('🚨 INCIDENT P1 — DNS failures massifs','system'),T('Les utilisateurs ne peuvent plus accéder au site.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('dig <domain>           — Requête DNS'),T('nslookup <domain>      — Résolution DNS'),T('cat /etc/resolv.conf   — Config DNS'),T('systemctl status named — Status BIND'),T('systemctl restart named— Redémarrer BIND'),T('journalctl -u named    — Logs BIND'),T('cat /etc/named.conf    — Config BIND'),T('nano /etc/named.conf   — Éditer config'),T('named-checkconf        — Valider config'),T('ping <host>            — Test connectivité'),T('hint                   — Obtenir un indice')]},
+'dig api.company.com':{out:[T('; <<>> DiG 9.18.1 <<>> api.company.com'),T(';; connection timed out; no servers could be reached'),T(';; SERVFAIL','error')],trig:['diag']},
+'nslookup api.company.com':{out:[T('Server: 10.0.0.2'),T("** server can't find api.company.com: SERVFAIL",'error')],trig:['diag']},
+'ping api.company.com':{out:[T('ping: Temporary failure in name resolution','error')]},
+'cat /etc/resolv.conf':{out:[T('nameserver 10.0.0.2'),T('nameserver 8.8.8.8')]},
+'systemctl status named':{out:[T('● named.service - BIND DNS'),T('   Active: active (running) but DEGRADED','error'),T('   Warning: configuration has errors','warn')],trig:['diag']},
+'journalctl -u named':{out:[T('named: zone company.com/IN: loading failed','error'),T('named: /etc/named.conf:24: missing semicolon','error'),T('named: running with degraded configuration','warn')],trig:['find'],log:L('warn','Root cause: semicolon manquant named.conf:24')},
+'cat /etc/named.conf':{out:[T('options {'),T('    directory "/var/named";'),T('    listen-on port 53 { any; };'),T('};'),T('zone "company.com" IN {'),T('    type master;'),T('    file "company.com.zone"    ← SEMICOLON MANQUANT','error'),T('};')],trig:['find']},
+'named-checkconf':{out:[T("/etc/named.conf:24: missing ';'",'error')],trig:['find']},
+'nano /etc/named.conf':{out:[T('Correction: semicolon ajouté ligne 24','success'),T('Fichier sauvegardé.','success')],trig:['fix'],log:L('success','Config DNS corrigée')},
+'vim /etc/named.conf':{out:[T('Correction: semicolon ajouté ligne 24','success')],trig:['fix'],log:L('success','Config DNS corrigée')},
+'systemctl restart named':{out:[T('Restarting BIND...','info'),T('Active: active (running) — fully operational','success'),T('All zones loaded successfully.','success')],trig:['fix'],log:L('success','DNS redémarré'),mu:{'Uptime':99.9,'Req. échouées':2,'Users impactés':0}},
+'hint':{out:[T('💡 1. dig/nslookup pour diagnostiquer','info'),T('2. journalctl -u named pour les logs'),T('3. cat /etc/named.conf pour la config'),T('4. nano + systemctl restart pour corriger')]}
+},
+{
+'dig api.company.com':{out:[T('api.company.com. 300 IN A 10.0.1.50','success')],trig:['verify']},
+'nslookup api.company.com':{out:[T('Name: api.company.com','success'),T('Address: 10.0.1.50','success')],trig:['verify']},
+'ping api.company.com':{out:[T('64 bytes from 10.0.1.50: time=0.45ms','success')],trig:['verify']}
+}));
+
+// ============================================================
+// LINUX 2: Disque plein
+// ============================================================
+SC.push(S('disk','linux','Disque plein /var/log','Les services crashent, impossible d\'écrire sur le disque. /var/log semble saturé.','easy','Facile',
+{'Disque /var':{v:100,max:100,u:'%'},'Services down':{v:3,max:5,u:''},'Logs/jour':{v:12,max:15,u:'GB'}},
+[O('diag','Identifier la partition pleine'),O('find','Trouver les fichiers volumineux'),O('fix','Nettoyer et libérer l\'espace'),O('verify','Vérifier l\'espace libéré')],
+[L('error','ALERT: Filesystem /var 100% full'),L('error','MySQL: Unable to write binlog'),L('warn','Nginx: failed to open log file'),L('info','On-call notified')],
+[T('🚨 INCIDENT P1 — Disque /var plein à 100%','system'),T('Plusieurs services ne peuvent plus écrire.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('df -h                  — Espace disque'),T('du -sh /var/*          — Taille par dossier'),T('du -sh /var/log/*      — Détail des logs'),T('ls -lhS /var/log/      — Lister par taille'),T('find /var/log -size +1G — Fichiers > 1GB'),T('cat /etc/logrotate.conf— Config logrotate'),T('truncate -s 0 <file>   — Vider un fichier'),T('rm <file>              — Supprimer fichier'),T('journalctl --vacuum-size=100M — Nettoyer journal'),T('logrotate -f /etc/logrotate.conf — Forcer rotation'),T('systemctl restart nginx — Redémarrer nginx'),T('systemctl restart mysql — Redémarrer mysql'),T('hint                   — Indice')]},
+'df -h':{out:[T('Filesystem      Size  Used Avail Use% Mounted'),T('/dev/sda1        50G   12G   38G  24% /'),T('/dev/sda2        20G   20G     0 100% /var','error'),T('/dev/sda3       100G   45G   55G  45% /home')],trig:['diag']},
+'du -sh /var/*':{out:[T('16K   /var/cache'),T('4.0K  /var/tmp'),T('19G   /var/log','error'),T('1.2G  /var/lib')],trig:['diag']},
+'du -sh /var/log/*':{out:[T('8.2G  /var/log/nginx/access.log','error'),T('6.1G  /var/log/mysql/slow-query.log','error'),T('3.8G  /var/log/syslog','warn'),T('245M  /var/log/auth.log'),T('89M   /var/log/journal')],trig:['find'],log:L('warn','Fichiers volumineux: nginx 8.2G, mysql 6.1G, syslog 3.8G')},
+'ls -lhS /var/log/':{out:[T('-rw-r--r-- 8.2G nginx/access.log','error'),T('-rw-r--r-- 6.1G mysql/slow-query.log','error'),T('-rw-r--r-- 3.8G syslog','warn'),T('-rw-r--r-- 245M auth.log')],trig:['find']},
+'find /var/log -size +1G':{out:[T('/var/log/nginx/access.log (8.2G)','error'),T('/var/log/mysql/slow-query.log (6.1G)','error'),T('/var/log/syslog (3.8G)','warn')],trig:['find']},
+'cat /etc/logrotate.conf':{out:[T('# Logrotate config'),T('weekly'),T('rotate 4'),T('# ⚠ /var/log/nginx/ et /var/log/mysql/ non inclus !','warn')]},
+'truncate -s 0 /var/log/nginx/access.log':{out:[T('Fichier vidé: /var/log/nginx/access.log','success'),T('8.2G libérés','success')],trig:['fix'],log:L('success','access.log vidé: +8.2G')},
+'truncate -s 0 /var/log/mysql/slow-query.log':{out:[T('Fichier vidé: /var/log/mysql/slow-query.log','success'),T('6.1G libérés','success')],trig:['fix'],log:L('success','slow-query.log vidé: +6.1G')},
+'rm /var/log/nginx/access.log':{out:[T('⚠ Attention: rm supprime le fichier, le service ne pourra plus logger','warn'),T('Utilisez plutôt: truncate -s 0','info')]},
+'journalctl --vacuum-size=100M':{out:[T('Vacuuming done. Freed 2.8G','success')],trig:['fix'],log:L('success','Journal nettoyé: +2.8G')},
+'logrotate -f /etc/logrotate.conf':{out:[T('Forcing log rotation...','info'),T('Rotation completed for all configured logs','success')],trig:['fix'],log:L('success','Logrotate forcé')},
+'systemctl restart nginx':{out:[T('nginx restarted successfully','success')],trig:['fix'],mu:{'Services down':1}},
+'systemctl restart mysql':{out:[T('mysql restarted successfully','success')],trig:['fix'],mu:{'Services down':0}},
+'hint':{out:[T('💡 1. df -h pour voir les partitions','info'),T('2. du -sh /var/log/* pour trouver les gros'),T('3. truncate -s 0 pour vider sans supprimer'),T('4. journalctl --vacuum-size pour le journal'),T('5. Relancez les services')]}
+},
+{
+'df -h':{out:[T('/dev/sda2        20G  2.8G   17G  14% /var','success')],trig:['verify']},
+'du -sh /var/log/*':{out:[T('0  /var/log/nginx/access.log','success'),T('0  /var/log/mysql/slow-query.log','success'),T('245M /var/log/auth.log')],trig:['verify']}
+}));
+
+// ============================================================
+// LINUX 3: Service Nginx down
+// ============================================================
+SC.push(S('nginx','linux','Service Nginx down','Nginx refuse de démarrer après un changement de configuration.','easy','Facile',
+{'Site web':{v:0,max:1,u:'DOWN'},'Erreurs 502':{v:100,max:100,u:'%'},'Users impactés':{v:5200,max:6000,u:''}},
+[O('diag','Vérifier le status Nginx'),O('find','Identifier l\'erreur de config'),O('fix','Corriger et redémarrer'),O('verify','Vérifier le site')],
+[L('error','ALERT: Nginx is not running'),L('error','502 Bad Gateway on all endpoints'),L('warn','Last config change: 10 min ago'),L('info','On-call notified')],
+[T('🚨 INCIDENT P1 — Site web down','system'),T('Nginx ne tourne plus depuis un changement de config.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('systemctl status nginx  — Status Nginx'),T('systemctl start nginx   — Démarrer Nginx'),T('systemctl restart nginx — Redémarrer Nginx'),T('nginx -t                — Tester la config'),T('cat /etc/nginx/nginx.conf'),T('cat /etc/nginx/sites-enabled/default'),T('nano /etc/nginx/sites-enabled/default'),T('journalctl -u nginx     — Logs Nginx'),T('ss -tlnp                — Ports en écoute'),T('curl localhost           — Test HTTP'),T('hint                    — Indice')]},
+'systemctl status nginx':{out:[T('● nginx.service - Nginx HTTP Server'),T('   Active: failed (Result: exit-code)','error'),T('   Process: 2841 ExecStart (code=exited, status=1/FAILURE)','error'),T('   Last config test failed','warn')],trig:['diag']},
+'systemctl start nginx':{out:[T('Job for nginx.service failed.','error'),T('See journalctl -u nginx for details.','info')]},
+'journalctl -u nginx':{out:[T('nginx: [emerg] unknown directive "proxy_passs"','error'),T('in /etc/nginx/sites-enabled/default:14','error'),T('nginx: configuration file test failed','error')],trig:['find'],log:L('warn','Erreur: typo "proxy_passs" ligne 14')},
+'nginx -t':{out:[T('nginx: [emerg] unknown directive "proxy_passs"','error'),T('in /etc/nginx/sites-enabled/default:14','error'),T('nginx: configuration file test failed','error')],trig:['find']},
+'cat /etc/nginx/sites-enabled/default':{out:[T('server {'),T('    listen 80;'),T('    server_name company.com;'),T(''),T('    location / {'),T('        proxy_passs http://127.0.0.1:3000;  ← TYPO !','error'),T('    }'),T('}')],trig:['find']},
+'cat /etc/nginx/nginx.conf':{out:[T('# Main nginx config — OK'),T('worker_processes auto;'),T('events { worker_connections 1024; }'),T('http { include /etc/nginx/sites-enabled/*; }')]},
+'nano /etc/nginx/sites-enabled/default':{out:[T('Correction: proxy_passs → proxy_pass','success'),T('Fichier sauvegardé.','success')],trig:['fix'],log:L('success','Typo corrigée: proxy_pass')},
+'ss -tlnp':{out:[T('State  Local Address:Port  Process'),T('LISTEN 0.0.0.0:22        sshd'),T('LISTEN 127.0.0.1:3000    node'),T('⚠ Port 80 non listé — Nginx ne tourne pas','warn')]},
+'systemctl restart nginx':{out:[T('nginx restarted successfully','success'),T('nginx: configuration file test is successful','success')],trig:['fix'],log:L('success','Nginx redémarré'),mu:{'Site web':1,'Erreurs 502':0,'Users impactés':0}},
+'hint':{out:[T('💡 1. systemctl status nginx','info'),T('2. nginx -t ou journalctl -u nginx'),T('3. cat le fichier vhost pour voir la typo'),T('4. nano pour corriger + systemctl restart')]}
+},
+{
+'curl localhost':{out:[T('HTTP/1.1 200 OK','success'),T('{"status":"healthy"}','success')],trig:['verify']},
+'ss -tlnp':{out:[T('LISTEN 0.0.0.0:80  nginx','success'),T('LISTEN 0.0.0.0:22  sshd')],trig:['verify']},
+'systemctl status nginx':{out:[T('● nginx.service — Active: active (running)','success')],trig:['verify']}
+}));
+
+// ============================================================
+// LINUX 4: Connexion SSH refusée
+// ============================================================
+SC.push(S('ssh','linux','Connexion SSH refusée','Impossible de se connecter en SSH au serveur de production.','easy','Facile',
+{'SSH':{v:0,max:1,u:'DOWN'},'Port 22':{v:0,max:1,u:'CLOSED'},'Accès distant':{v:0,max:100,u:'%'}},
+[O('diag','Diagnostiquer pourquoi SSH échoue'),O('find','Identifier la cause root'),O('fix','Corriger et rétablir SSH'),O('verify','Vérifier la connexion')],
+[L('error','ALERT: SSH unreachable on srv-prod-01'),L('error','Connection refused on port 22'),L('warn','Admin access lost'),L('info','Console physique disponible')],
+[T('🚨 INCIDENT P2 — SSH inaccessible','system'),T('Vous êtes sur la console physique du serveur.','system'),T('Impossible de se connecter en SSH depuis l\'extérieur.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('systemctl status sshd   — Status SSH'),T('systemctl start sshd    — Démarrer SSH'),T('systemctl restart sshd  — Redémarrer SSH'),T('cat /etc/ssh/sshd_config— Config SSH'),T('nano /etc/ssh/sshd_config— Éditer config'),T('ss -tlnp                — Ports en écoute'),T('journalctl -u sshd      — Logs SSH'),T('sshd -t                 — Tester config SSH'),T('cat /var/log/auth.log   — Logs auth'),T('hint                    — Indice')]},
+'systemctl status sshd':{out:[T('● sshd.service - OpenSSH Server'),T('   Active: inactive (dead)','error'),T('   Last started: 3 days ago','warn')],trig:['diag']},
+'systemctl start sshd':{out:[T('Job for sshd.service failed.','error'),T('See journalctl -u sshd for details.','info')]},
+'ss -tlnp':{out:[T('State  Local Address:Port  Process'),T('LISTEN 0.0.0.0:80  nginx'),T('⚠ Port 22 absent — SSHD ne tourne pas','warn')],trig:['diag']},
+'journalctl -u sshd':{out:[T('sshd: /etc/ssh/sshd_config line 17: Bad configuration option: PermitRootLoginn','error'),T('sshd: terminating, 1 bad configuration options','error')],trig:['find'],log:L('warn','Cause: typo sshd_config ligne 17')},
+'sshd -t':{out:[T('/etc/ssh/sshd_config line 17: Bad option: PermitRootLoginn','error')],trig:['find']},
+'cat /etc/ssh/sshd_config':{out:[T('Port 22'),T('ListenAddress 0.0.0.0'),T('PermitRootLoginn no     ← TYPO !','error'),T('PubkeyAuthentication yes'),T('PasswordAuthentication no')],trig:['find']},
+'cat /var/log/auth.log':{out:[T('sshd[2841]: Server listening on 0.0.0.0 port 22 — STOPPED','error'),T('sshd[2841]: fatal: bad configuration option','error')]},
+'nano /etc/ssh/sshd_config':{out:[T('Correction: PermitRootLoginn → PermitRootLogin','success'),T('Fichier sauvegardé.','success')],trig:['fix'],log:L('success','sshd_config corrigé')},
+'systemctl restart sshd':{out:[T('sshd restarted successfully','success'),T('Server listening on 0.0.0.0 port 22','success')],trig:['fix'],log:L('success','SSHD redémarré'),mu:{'SSH':1,'Port 22':1,'Accès distant':100}},
+'hint':{out:[T('💡 1. systemctl status sshd','info'),T('2. journalctl -u sshd ou sshd -t'),T('3. cat /etc/ssh/sshd_config'),T('4. nano pour corriger + restart')]}
+},
+{
+'ss -tlnp':{out:[T('LISTEN 0.0.0.0:22  sshd','success'),T('LISTEN 0.0.0.0:80  nginx')],trig:['verify']},
+'systemctl status sshd':{out:[T('● sshd.service — Active: active (running)','success')],trig:['verify']}
+}));
+
+// ============================================================
+// LINUX 5: Permissions cassées
+// ============================================================
+SC.push(S('perms','linux','Permissions fichiers cassées','Un chmod -R 777 accidentel sur /etc, des services refusent de démarrer.','easy','Facile',
+{'Services OK':{v:1,max:4,u:'/4'},'Sécurité':{v:10,max:100,u:'%'},'SSH':{v:0,max:1,u:'DOWN'}},
+[O('diag','Identifier les permissions cassées'),O('find','Trouver les fichiers critiques'),O('fix','Restaurer les permissions'),O('verify','Vérifier les services')],
+[L('error','ALERT: SSH refusing connections — bad permissions'),L('error','Nginx SSL: permission denied on cert'),L('warn','chmod 777 detected on /etc'),L('info','Console access available')],
+[T('🚨 INCIDENT P1 — Permissions /etc cassées','system'),T('Quelqu\'un a fait chmod -R 777 /etc.','system'),T('SSH et d\'autres services refusent de démarrer.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('ls -la /etc/ssh/         — Perms SSH'),T('ls -la /etc/nginx/       — Perms Nginx'),T('stat <file>              — Détails fichier'),T('chmod 600 <file>         — Changer perms'),T('chmod 644 <file>         — Lecture tous'),T('chmod 700 <dir>          — Dir privé'),T('chmod 755 <dir>          — Dir lisible'),T('chown root:root <file>   — Proprio root'),T('systemctl restart sshd'),T('systemctl restart nginx'),T('journalctl -u sshd'),T('hint                     — Indice')]},
+'ls -la /etc/ssh/':{out:[T('-rwxrwxrwx root 777 sshd_config      ← DANGEREUX','error'),T('-rwxrwxrwx root 777 ssh_host_rsa_key ← DANGEREUX','error'),T('-rwxrwxrwx root 777 ssh_host_ed25519_key','error')],trig:['diag']},
+'ls -la /etc/nginx/':{out:[T('-rwxrwxrwx root 777 nginx.conf','error'),T('drwxrwxrwx root 777 ssl/','error')],trig:['diag']},
+'journalctl -u sshd':{out:[T('sshd: @@@@@@@@ WARNING: UNPROTECTED PRIVATE KEY FILE! @@@@@@@@','error'),T('sshd: Permissions 0777 for /etc/ssh/ssh_host_rsa_key are too open','error'),T('sshd: It is required that your private key files are NOT accessible by others','error'),T('sshd: bad permissions — refusing to start','error')],trig:['find'],log:L('warn','SSH refuse: clés privées en 777')},
+'stat /etc/ssh/ssh_host_rsa_key':{out:[T('Access: (0777/-rwxrwxrwx) Uid: 0/root Gid: 0/root','error'),T('⚠ Devrait être 0600','warn')],trig:['find']},
+'chmod 600 /etc/ssh/ssh_host_rsa_key':{out:[T('Permissions: 600 (-rw-------)','success')],trig:['fix'],log:L('success','ssh_host_rsa_key → 600')},
+'chmod 600 /etc/ssh/ssh_host_ed25519_key':{out:[T('Permissions: 600 (-rw-------)','success')],trig:['fix']},
+'chmod 644 /etc/ssh/sshd_config':{out:[T('Permissions: 644 (-rw-r--r--)','success')],trig:['fix']},
+'chmod 600 /etc/nginx/ssl/*':{out:[T('Permissions SSL certs: 600','success')],trig:['fix'],log:L('success','Certs SSL → 600')},
+'chmod 755 /etc/ssh':{out:[T('Permissions: 755 (drwxr-xr-x)','success')],trig:['fix']},
+'chmod 755 /etc/nginx':{out:[T('Permissions: 755 (drwxr-xr-x)','success')],trig:['fix']},
+'systemctl restart sshd':{out:[T('sshd restarted successfully','success')],trig:['fix'],log:L('success','SSHD démarré'),mu:{'SSH':1,'Services OK':3}},
+'systemctl restart nginx':{out:[T('nginx restarted successfully','success')],trig:['fix'],mu:{'Services OK':4,'Sécurité':95}},
+'hint':{out:[T('💡 1. ls -la /etc/ssh/ pour voir les perms','info'),T('2. journalctl -u sshd pour l\'erreur'),T('3. chmod 600 sur les clés privées SSH'),T('4. chmod 644 sur les configs'),T('5. Redémarrer les services')]}
+},
+{
+'ls -la /etc/ssh/':{out:[T('-rw------- root 600 ssh_host_rsa_key','success'),T('-rw-r--r-- root 644 sshd_config','success')],trig:['verify']},
+'systemctl status sshd':{out:[T('● sshd — Active: active (running)','success')],trig:['verify']},
+'systemctl status nginx':{out:[T('● nginx — Active: active (running)','success')],trig:['verify']}
+}));
+
+// ============================================================
+// LINUX 6: Réseau — pas d'internet
+// ============================================================
+SC.push(S('net','linux','Serveur sans accès réseau','Le serveur ne peut plus atteindre internet ni les autres machines.','easy','Facile',
+{'Connectivité':{v:0,max:100,u:'%'},'Gateway':{v:0,max:1,u:'NONE'},'DNS ext.':{v:0,max:1,u:'FAIL'}},
+[O('diag','Diagnostiquer le réseau'),O('find','Identifier la cause'),O('fix','Corriger la configuration'),O('verify','Vérifier la connectivité')],
+[L('error','ALERT: srv-prod-01 unreachable'),L('error','No route to host — all external connections failing'),L('warn','Interface eth0 is UP but no traffic'),L('info','Console access available')],
+[T('🚨 INCIDENT P2 — Réseau down','system'),T('Le serveur n\'atteint plus rien en dehors du réseau local.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('ip addr                — Interfaces réseau'),T('ip route               — Table de routage'),T('ip route add default via <gw> — Ajouter route'),T('ping 10.0.0.1           — Ping gateway'),T('ping 8.8.8.8            — Ping internet'),T('ping google.com         — Ping DNS'),T('cat /etc/resolv.conf    — Config DNS'),T('nano /etc/resolv.conf   — Éditer DNS'),T('traceroute 8.8.8.8      — Tracer la route'),T('nmcli device status     — Status NetworkManager'),T('hint                    — Indice')]},
+'ip addr':{out:[T('1: lo: <LOOPBACK,UP> inet 127.0.0.1/8'),T('2: eth0: <BROADCAST,UP> inet 10.0.0.50/24'),T('   link/ether fa:16:3e:xx:xx:xx'),T('   ✓ Interface UP, IP correcte','info')],trig:['diag']},
+'ip route':{out:[T('10.0.0.0/24 dev eth0 proto kernel'),T('⚠ Aucune route par défaut (default gateway) !','error')],trig:['find'],log:L('warn','Pas de default gateway configurée')},
+'ping 10.0.0.1':{out:[T('64 bytes from 10.0.0.1: time=0.3ms','success'),T('→ Gateway joignable en local')],trig:['diag']},
+'ping 8.8.8.8':{out:[T('connect: Network is unreachable','error')]},
+'ping google.com':{out:[T('ping: google.com: Temporary failure in name resolution','error')]},
+'traceroute 8.8.8.8':{out:[T('traceroute: network unreachable','error')]},
+'cat /etc/resolv.conf':{out:[T('# Fichier vide !','warn'),T('⚠ Aucun nameserver configuré','error')],trig:['find']},
+'nmcli device status':{out:[T('DEVICE  TYPE      STATE      CONNECTION'),T('eth0    ethernet  connected  Wired')],trig:['diag']},
+'ip route add default via 10.0.0.1':{out:[T('Default route added via 10.0.0.1','success')],trig:['fix'],log:L('success','Route par défaut ajoutée'),mu:{'Gateway':1,'Connectivité':50}},
+'nano /etc/resolv.conf':{out:[T('Ajout: nameserver 8.8.8.8','success'),T('Ajout: nameserver 1.1.1.1','success'),T('Fichier sauvegardé.','success')],trig:['fix'],log:L('success','DNS configuré'),mu:{'DNS ext.':1,'Connectivité':100}},
+'hint':{out:[T('💡 1. ip addr — l\'interface est-elle UP ?','info'),T('2. ip route — y a-t-il une gateway ?'),T('3. ip route add default via 10.0.0.1'),T('4. cat /etc/resolv.conf — DNS configuré ?'),T('5. nano /etc/resolv.conf pour ajouter DNS')]}
+},
+{
+'ping 8.8.8.8':{out:[T('64 bytes from 8.8.8.8: time=12ms','success')],trig:['verify']},
+'ping google.com':{out:[T('64 bytes from google.com: time=14ms','success')],trig:['verify']},
+'ip route':{out:[T('default via 10.0.0.1 dev eth0','success'),T('10.0.0.0/24 dev eth0')],trig:['verify']}
+}));
+
+// ============================================================
+// LINUX 7: Process zombie RAM/CPU
+// ============================================================
+SC.push(S('zombie','linux','Process zombie mange la RAM','Un process consomme toute la RAM et le CPU, le serveur ne répond presque plus.','easy','Facile',
+{'CPU':{v:98,max:100,u:'%'},'RAM':{v:95,max:100,u:'%'},'Load avg':{v:24,max:30,u:''}},
+[O('diag','Identifier le process coupable'),O('find','Comprendre la cause'),O('fix','Tuer le process et stabiliser'),O('verify','Vérifier le retour à la normale')],
+[L('error','ALERT: CPU 98%, RAM 95% on srv-app-01'),L('error','Load average: 24.5'),L('warn','OOM killer approaching'),L('info','On-call notified')],
+[T('🚨 INCIDENT P1 — Serveur saturé','system'),T('CPU et RAM critiques, le serveur rame.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('top                    — Processus'),T('htop                   — Moniteur interactif'),T('ps aux --sort=-%mem    — Process par RAM'),T('ps aux --sort=-%cpu    — Process par CPU'),T('free -h                — Mémoire'),T('kill <pid>             — Terminer process'),T('kill -9 <pid>          — Forcer kill'),T('strace -p <pid>        — Tracer le process'),T('cat /proc/<pid>/cmdline— Commande du process'),T('hint                   — Indice')]},
+'top':{out:[T('load average: 24.52, 22.10, 18.40'),T('%Cpu: 98.2%  —  %Mem: 95.1%','error'),T(''),T('  PID USER   %CPU %MEM COMMAND'),T('14523 www    89.2 78.4 python3 /tmp/backup_script.py','error'),T('  842 root    3.1  2.0 sshd'),T(' 1201 node    2.1  4.2 node /app/server.js'),T(' 1105 root    1.8  1.2 nginx')],trig:['diag']},
+'htop':{out:[T('CPU [||||||||||||||||||||||||||||||||||98.2%]','error'),T('Mem [|||||||||||||||||||||||||||||||||95.1%]','error'),T(''),T('PID 14523: python3 /tmp/backup_script.py — 89% CPU, 78% RAM','error')],trig:['diag']},
+'ps aux --sort=-%mem':{out:[T('USER  PID   %CPU %MEM COMMAND'),T('www  14523  89.2 78.4 python3 /tmp/backup_script.py','error'),T('node  1201   2.1  4.2 node /app/server.js'),T('root   842   3.1  2.0 sshd')],trig:['diag']},
+'ps aux --sort=-%cpu':{out:[T('USER  PID   %CPU %MEM COMMAND'),T('www  14523  89.2 78.4 python3 /tmp/backup_script.py','error')],trig:['diag']},
+'free -h':{out:[T('              total    used    free'),T('Mem:          8.0Gi   7.6Gi   0.2Gi','error'),T('Swap:         2.0Gi   2.0Gi   0.0Gi','error')]},
+'strace -p 14523':{out:[T('write(1, "Processing chunk 847264...", 28)',''),T('open("/tmp/data_chunk_847264.tmp", O_WRONLY|O_CREAT)'),T('⚠ Boucle infinie — crée des fichiers temp sans fin','error')],trig:['find'],log:L('warn','PID 14523: boucle infinie, crée des fichiers temp')},
+'cat /proc/14523/cmdline':{out:[T('python3 /tmp/backup_script.py --full --no-limit','error'),T('⚠ Script lancé avec --no-limit = pas de borne','warn')],trig:['find']},
+'kill 14523':{out:[T('Signal SIGTERM envoyé au PID 14523','info'),T('Process ne répond pas...','warn'),T('Utilisez kill -9 pour forcer','info')]},
+'kill -9 14523':{out:[T('Process 14523 killed (SIGKILL)','success'),T('7.6 GB RAM libérés','success')],trig:['fix'],log:L('success','PID 14523 tué — RAM libérée'),mu:{'CPU':8,'RAM':22,'Load avg':2}},
+'hint':{out:[T('💡 1. top ou htop pour identifier','info'),T('2. strace -p <pid> pour comprendre'),T('3. kill -9 <pid> pour forcer l\'arrêt'),T('4. Vérifier avec free -h')]}
+},
+{
+'top':{out:[T('load average: 1.20, 4.52, 8.30'),T('%Cpu: 8.1%  —  %Mem: 22.5%','success')],trig:['verify']},
+'free -h':{out:[T('Mem:  8.0Gi  1.8Gi  5.8Gi','success')],trig:['verify']}
+}));
+
+// ============================================================
+// LINUX 8: Crontab cassée
+// ============================================================
+SC.push(S('cron','linux','Crontab qui ne s\'exécute pas','Le backup quotidien ne tourne plus depuis 5 jours.','easy','Facile',
+{'Dernière backup':{v:5,max:7,u:'j ago'},'Données à risque':{v:75,max:100,u:'%'},'Cron jobs':{v:0,max:1,u:'FAIL'}},
+[O('diag','Vérifier l\'état du cron'),O('find','Identifier pourquoi ça ne tourne pas'),O('fix','Corriger la crontab'),O('verify','Vérifier l\'exécution')],
+[L('error','ALERT: No backup since 5 days'),L('warn','Cron job /opt/backup.sh not executed'),L('info','Last successful backup: Feb 7')],
+[T('🚨 INCIDENT P2 — Backup cron cassé','system'),T('Le script de backup /opt/backup.sh ne s\'exécute plus.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('crontab -l              — Lister le crontab'),T('crontab -e              — Éditer le crontab'),T('systemctl status cron   — Status du service'),T('cat /var/log/syslog | grep cron'),T('cat /opt/backup.sh      — Voir le script'),T('ls -la /opt/backup.sh   — Permissions'),T('chmod +x /opt/backup.sh — Rendre exécutable'),T('/opt/backup.sh          — Tester le script'),T('which tar               — Vérifier tar'),T('echo $PATH              — Vérifier PATH'),T('hint                    — Indice')]},
+'systemctl status cron':{out:[T('● cron.service — Active: active (running)','success'),T('   Cron daemon is running normally')],trig:['diag']},
+'crontab -l':{out:[T('# Backup quotidien'),T('0 2 * * * backup.sh','error'),T(''),T('⚠ Pas de chemin absolu ! Devrait être /opt/backup.sh','warn')],trig:['find'],log:L('warn','Crontab: chemin relatif "backup.sh" au lieu de "/opt/backup.sh"')},
+'cat /var/log/syslog | grep cron':{out:[T('CRON: (root) CMD (backup.sh)'),T('/bin/sh: backup.sh: not found','error'),T('CRON: (root) CMD (backup.sh)'),T('/bin/sh: backup.sh: not found','error')],trig:['find']},
+'cat /opt/backup.sh':{out:[T('#!/bin/bash'),T('tar -czf /backup/$(date +%Y%m%d).tar.gz /var/www/'),T('echo "Backup done" >> /var/log/backup.log')]},
+'ls -la /opt/backup.sh':{out:[T('-rw-r--r-- root root /opt/backup.sh'),T('⚠ Le script n\'est pas exécutable !','warn')],trig:['find']},
+'chmod +x /opt/backup.sh':{out:[T('Permissions: -rwxr-xr-x','success')],trig:['fix'],log:L('success','Script rendu exécutable')},
+'crontab -e':{out:[T('Correction: 0 2 * * * /opt/backup.sh','success'),T('Crontab sauvegardé.','success')],trig:['fix'],log:L('success','Crontab corrigé: chemin absolu'),mu:{'Cron jobs':1}},
+'/opt/backup.sh':{out:[T('Backup done — /backup/20260212.tar.gz created','success')],trig:['fix'],log:L('success','Backup manuel réussi'),mu:{'Dernière backup':0,'Données à risque':5}},
+'echo $PATH':{out:[T('/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin'),T('⚠ /opt/ n\'est pas dans le PATH — d\'où l\'erreur cron','info')]},
+'hint':{out:[T('💡 1. crontab -l pour voir la conf','info'),T('2. grep cron dans syslog'),T('3. ls -la pour les permissions'),T('4. chmod +x + crontab -e avec chemin absolu')]}
+},
+{
+'crontab -l':{out:[T('0 2 * * * /opt/backup.sh','success')],trig:['verify']},
+'ls -la /opt/backup.sh':{out:[T('-rwxr-xr-x root root /opt/backup.sh','success')],trig:['verify']}
+}));
+
+// ============================================================
+// DOCKER 1: Container crash loop
+// ============================================================
+SC.push(S('dcloop','docker','Container en crash loop','Un container redémarre en boucle, exit code 1.','easy','Facile',
+{'Container':{v:0,max:1,u:'DOWN'},'Restarts':{v:14,max:20,u:'x'},'App status':{v:0,max:100,u:'%'}},
+[O('diag','Identifier le container en échec'),O('find','Trouver la cause du crash'),O('fix','Corriger et relancer'),O('verify','Vérifier le container')],
+[L('error','ALERT: container api-backend restarting loop'),L('error','14 restarts in 10 minutes'),L('warn','Exit code: 1'),L('info','On-call notified')],
+[T('🚨 INCIDENT P2 — Container en crash loop','system'),T('Le container api-backend redémarre sans cesse.','system'),T(''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('docker ps -a            — Lister containers'),T('docker logs api-backend — Logs du container'),T('docker inspect api-backend — Détails'),T('cat docker-compose.yml  — Config compose'),T('nano docker-compose.yml — Éditer compose'),T('docker-compose down     — Stopper'),T('docker-compose up -d    — Relancer'),T('hint                    — Indice')]},
+'docker ps -a':{out:[T('CONTAINER ID  IMAGE          STATUS                     NAMES'),T('a3f8b2c1     api:latest     Restarting (1) 5 sec ago   api-backend','error'),T('7d1e4a9b     postgres:15    Up 2 hours                 db'),T('b29c6f1d     redis:7        Up 2 hours                 cache')],trig:['diag']},
+'docker logs api-backend':{out:[T('Error: DATABASE_URL environment variable is required','error'),T('Process exited with code 1','error'),T('...restarting...'),T('Error: DATABASE_URL environment variable is required','error')],trig:['find'],log:L('warn','Cause: variable DATABASE_URL manquante')},
+'docker inspect api-backend':{out:[T('"Env": ["NODE_ENV=production","PORT=3000"]'),T('⚠ DATABASE_URL absent !','error')],trig:['find']},
+'cat docker-compose.yml':{out:[T('services:'),T('  api-backend:'),T('    image: api:latest'),T('    environment:'),T('      - NODE_ENV=production'),T('      - PORT=3000'),T('      # DATABASE_URL manquant !','error'),T('    restart: always')],trig:['find']},
+'nano docker-compose.yml':{out:[T('Ajout: DATABASE_URL=postgres://app:secret@db:5432/production','success'),T('Sauvegardé.','success')],trig:['fix'],log:L('success','DATABASE_URL ajouté')},
+'docker-compose down':{out:[T('Stopping api-backend... done','info'),T('Stopping db... done','info')],trig:['fix']},
+'docker-compose up -d':{out:[T('Creating db... done','success'),T('Creating api-backend... done','success'),T('All containers started','success')],trig:['fix'],log:L('success','Containers relancés'),mu:{'Container':1,'Restarts':0,'App status':100}},
+'hint':{out:[T('💡 1. docker ps -a pour voir le status','info'),T('2. docker logs pour la cause'),T('3. cat docker-compose.yml'),T('4. nano pour ajouter la variable + relancer')]}
+},
+{
+'docker ps -a':{out:[T('a3f8b2c api:latest Up 30 seconds api-backend','success'),T('7d1e4a9 postgres:15 Up 2 hours db','success')],trig:['verify']},
+'docker logs api-backend':{out:[T('Connected to database','success'),T('Server listening on port 3000','success')],trig:['verify']}
+}));
+
+
+// ============================================================
+// DOCKER 2: docker-compose port already in use
+// ============================================================
+SC.push(S('dcport','docker','Port déjà utilisé','docker-compose up échoue car le port 80 est déjà pris.','easy','Facile',
+{'Container web':{v:0,max:1,u:'FAIL'},'Port 80':{v:1,max:1,u:'BUSY'},'Site':{v:0,max:100,u:'%'}},
+[O('diag','Identifier l\'erreur de port'),O('find','Trouver le process qui occupe le port'),O('fix','Libérer le port et relancer'),O('verify','Vérifier le container')],
+[L('error','ALERT: docker-compose up failed'),L('error','Bind for 0.0.0.0:80 failed: port already allocated'),L('info','On-call notified')],
+[T('🚨 INCIDENT P2 — Container web ne démarre pas','system'),T('docker-compose up échoue à chaque tentative.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('docker-compose up -d    — Lancer containers'),T('docker-compose logs     — Voir logs'),T('docker ps -a            — Lister containers'),T('ss -tlnp                — Ports en écoute'),T('lsof -i :80             — Qui utilise le port 80'),T('systemctl stop nginx    — Stopper Nginx'),T('kill <pid>              — Tuer un process'),T('cat docker-compose.yml'),T('hint                    — Indice')]},
+'docker-compose up -d':{out:[T('Creating web... error','error'),T('Bind for 0.0.0.0:80 failed: port is already allocated','error')],trig:['diag']},
+'docker-compose logs':{out:[T('web: Bind for 0.0.0.0:80 failed','error')],trig:['diag']},
+'docker ps -a':{out:[T('CONTAINER ID  IMAGE       STATUS                  NAMES'),T('(empty — no containers running)')],trig:['diag']},
+'ss -tlnp':{out:[T('State   Local Address:Port   Process'),T('LISTEN  0.0.0.0:80         nginx: master process','error'),T('LISTEN  0.0.0.0:22         sshd')],trig:['find'],log:L('warn','Port 80 occupé par Nginx natif')},
+'lsof -i :80':{out:[T('COMMAND PID  USER FD  TYPE  NAME'),T('nginx   1105 root 6u  IPv4  *:80 (LISTEN)','error'),T('→ Nginx natif tourne sur le port 80','warn')],trig:['find']},
+'cat docker-compose.yml':{out:[T('services:'),T('  web:'),T('    image: nginx:latest'),T('    ports:'),T('      - "80:80"')]},
+'systemctl stop nginx':{out:[T('Stopping nginx... done','success'),T('Port 80 libéré','success')],trig:['fix'],log:L('success','Nginx natif stoppé'),mu:{'Port 80':0}},
+'systemctl disable nginx':{out:[T('nginx.service disabled','success')],trig:['fix']},
+'docker-compose up -d':{dyn:true},
+'hint':{out:[T('💡 1. ss -tlnp pour voir qui a le port 80','info'),T('2. lsof -i :80 pour le détail'),T('3. systemctl stop nginx pour libérer'),T('4. docker-compose up -d pour relancer')]}
+},
+{
+'docker-compose up -d':{out:[T('Creating web... done','success'),T('web is running on port 80','success')],trig:['verify'],mu:{'Container web':1,'Site':100}},
+'docker ps -a':{out:[T('nginx:latest Up 10 seconds web','success')],trig:['verify']},
+'ss -tlnp':{out:[T('LISTEN 0.0.0.0:80 docker-proxy','success')],trig:['verify']}
+}));
+
+// ============================================================
+// DOCKER 3: Réseau Docker isolé
+// ============================================================
+SC.push(S('dcnet','docker','Containers isolés réseau','Deux containers ne communiquent pas entre eux.','medium','Moyen',
+{'API→DB':{v:0,max:1,u:'FAIL'},'Network':{v:0,max:1,u:'SPLIT'},'App':{v:0,max:100,u:'%'}},
+[O('diag','Identifier le problème de connectivité'),O('find','Trouver la cause réseau'),O('fix','Connecter les containers'),O('verify','Vérifier la communication')],
+[L('error','ALERT: API cannot reach database'),L('error','Connection refused from api to db'),L('warn','Containers are running but isolated'),L('info','On-call notified')],
+[T('🚨 INCIDENT P2 — Containers ne communiquent pas','system'),T('L\'API ne peut pas joindre la base de données.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('docker ps               — Containers actifs'),T('docker network ls       — Lister réseaux'),T('docker network inspect <name>'),T('docker inspect api-backend | grep Network'),T('docker inspect db | grep Network'),T('docker exec api-backend ping db'),T('docker network create app-net'),T('docker network connect app-net api-backend'),T('docker network connect app-net db'),T('cat docker-compose.yml'),T('hint                    — Indice')]},
+'docker ps':{out:[T('CONTAINER ID IMAGE        STATUS      NAMES'),T('a3f8b2c1    api:latest   Up 1 hour   api-backend'),T('7d1e4a9b    postgres:15  Up 1 hour   db')],trig:['diag']},
+'docker network ls':{out:[T('NETWORK ID   NAME       DRIVER'),T('abc123       bridge     bridge'),T('def456       api_net    bridge'),T('ghi789       db_net     bridge'),T('⚠ api et db sur des réseaux différents !','warn')],trig:['find']},
+'docker inspect api-backend | grep Network':{out:[T('"NetworkMode": "api_net"','warn')],trig:['find']},
+'docker inspect db | grep Network':{out:[T('"NetworkMode": "db_net"','warn')],trig:['find'],log:L('warn','api sur api_net, db sur db_net — isolés')},
+'docker exec api-backend ping db':{out:[T('ping: bad address \'db\'','error'),T('→ Le container db n\'est pas joignable','error')],trig:['diag']},
+'docker network create app-net':{out:[T('Network app-net created','success')],trig:['fix'],log:L('success','Réseau app-net créé')},
+'docker network connect app-net api-backend':{out:[T('api-backend connected to app-net','success')],trig:['fix'],log:L('success','api connecté à app-net')},
+'docker network connect app-net db':{out:[T('db connected to app-net','success')],trig:['fix'],log:L('success','db connecté à app-net'),mu:{'API→DB':1,'Network':1,'App':100}},
+'cat docker-compose.yml':{out:[T('⚠ Pas de réseau commun défini entre les services','warn')]},
+'hint':{out:[T('💡 1. docker network ls pour voir les réseaux','info'),T('2. docker inspect pour vérifier les assignations'),T('3. Créer un réseau commun'),T('4. docker network connect pour les relier')]}
+},
+{
+'docker exec api-backend ping db':{out:[T('64 bytes from db (172.20.0.3): time=0.1ms','success')],trig:['verify']},
+'docker network inspect app-net':{out:[T('Containers: api-backend, db','success')],trig:['verify']}
+}));
+
+// ============================================================
+// DOCKER 4: Espace disque images/volumes
+// ============================================================
+SC.push(S('dcdisk','docker','Docker mange le disque','Le disque est plein à cause des images et volumes Docker non nettoyés.','easy','Facile',
+{'Disque /':{v:97,max:100,u:'%'},'Images Docker':{v:45,max:50,u:'GB'},'Volumes orphans':{v:23,max:30,u:''}},
+[O('diag','Identifier l\'usage disque Docker'),O('find','Trouver les ressources inutilisées'),O('fix','Nettoyer Docker'),O('verify','Vérifier l\'espace récupéré')],
+[L('error','ALERT: Disk 97% full on /'),L('warn','/var/lib/docker consuming 45GB'),L('info','On-call notified')],
+[T('🚨 INCIDENT P2 — Disque plein par Docker','system'),T('/var/lib/docker prend tout l\'espace.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('df -h                   — Espace disque'),T('docker system df        — Usage Docker'),T('docker images           — Lister images'),T('docker volume ls        — Lister volumes'),T('docker ps -a            — Tous les containers'),T('docker image prune -a   — Suppr images inutilisées'),T('docker volume prune     — Suppr volumes orphelins'),T('docker system prune -a  — Grand nettoyage'),T('docker builder prune    — Cache de build'),T('hint                    — Indice')]},
+'df -h':{out:[T('Filesystem  Size  Used  Avail Use%  Mount'),T('/dev/sda1    50G   48G   1.2G  97%  /','error')],trig:['diag']},
+'docker system df':{out:[T('TYPE          TOTAL    ACTIVE   SIZE     RECLAIMABLE'),T('Images        47       3        42.8GB   38.2GB (89%)','error'),T('Containers    3        3        1.2GB    0B'),T('Volumes       28       3        12.4GB   10.8GB (87%)','warn'),T('Build Cache                     4.6GB    4.6GB (100%)','warn')],trig:['find'],log:L('warn','Docker: 38GB images + 10.8GB volumes récupérables')},
+'docker images':{out:[T('REPOSITORY    TAG       SIZE'),T('api           latest    245MB'),T('api           v2.3      245MB'),T('api           v2.2      240MB'),T('api           v2.1      238MB'),T('api           v2.0      235MB'),T('postgres      15        380MB'),T('redis         7         130MB'),T('node          18        950MB'),T('node          16        920MB'),T('ubuntu        22.04     77MB'),T('... +37 anciennes images','warn')],trig:['find']},
+'docker volume ls':{out:[T('DRIVER  VOLUME NAME'),T('local   app_data'),T('local   db_data'),T('local   cache_data'),T('local   abc123_orphan','warn'),T('... +24 volumes orphelins','warn')],trig:['find']},
+'docker ps -a':{out:[T('3 containers running (api, db, cache)')],trig:['diag']},
+'docker image prune -a':{out:[T('Deleted 44 images','success'),T('Total reclaimed space: 38.2GB','success')],trig:['fix'],log:L('success','38.2GB d\'images supprimées'),mu:{'Images Docker':4}},
+'docker volume prune':{out:[T('Deleted 25 volumes','success'),T('Total reclaimed space: 10.8GB','success')],trig:['fix'],log:L('success','10.8GB de volumes supprimés'),mu:{'Volumes orphans':0}},
+'docker builder prune':{out:[T('Deleted build cache','success'),T('Reclaimed: 4.6GB','success')],trig:['fix'],log:L('success','Cache build nettoyé')},
+'docker system prune -a':{out:[T('Deleted 44 images, 25 volumes, build cache','success'),T('Total reclaimed space: 53.6GB','success')],trig:['fix'],log:L('success','53.6GB récupérés'),mu:{'Disque /':24,'Images Docker':4,'Volumes orphans':0}},
+'hint':{out:[T('💡 1. docker system df pour l\'usage','info'),T('2. docker images / docker volume ls'),T('3. docker image prune -a pour les images'),T('4. docker volume prune pour les volumes'),T('5. ou docker system prune -a pour tout')]}
+},
+{
+'df -h':{out:[T('/dev/sda1  50G  12G  38G  24% /','success')],trig:['verify']},
+'docker system df':{out:[T('Images: 3 active, 1.2GB total','success'),T('Volumes: 3 active, 1.6GB total','success')],trig:['verify']}
+}));
+
+// ============================================================
+// DOCKER 5: Logs container explosent le disque
+// ============================================================
+SC.push(S('dclogs','docker','Logs Docker explosent','Un container produit des GB de logs qui remplissent le disque.','easy','Facile',
+{'Disque':{v:94,max:100,u:'%'},'Logs size':{v:32,max:40,u:'GB'},'Container':{v:1,max:1,u:'UP'}},
+[O('diag','Identifier le container qui log trop'),O('find','Trouver les fichiers de logs'),O('fix','Nettoyer et limiter les logs'),O('verify','Vérifier l\'espace')],
+[L('error','ALERT: Disk 94% — /var/lib/docker growing fast'),L('warn','Container api-backend logging excessively'),L('info','On-call notified')],
+[T('🚨 INCIDENT P2 — Logs Docker remplissent le disque','system'),T('Un container produit des logs massifs.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('df -h                   — Espace disque'),T('du -sh /var/lib/docker/containers/*'),T('docker ps               — Containers'),T('docker logs --tail 20 api-backend'),T('docker inspect api-backend | grep LogPath'),T('truncate -s 0 <logfile> — Vider le log'),T('nano /etc/docker/daemon.json — Config logs'),T('systemctl restart docker'),T('hint                    — Indice')]},
+'df -h':{out:[T('/dev/sda1  50G  47G  3G  94% /','error')],trig:['diag']},
+'du -sh /var/lib/docker/containers/*':{out:[T('32G  /var/lib/docker/containers/a3f8b2c1-xxx-json.log','error'),T('12M  /var/lib/docker/containers/7d1e4a9b-xxx-json.log'),T('4M   /var/lib/docker/containers/b29c6f1d-xxx-json.log')],trig:['find'],log:L('warn','api-backend: 32GB de logs')},
+'docker ps':{out:[T('api-backend  Up 15 days'),T('db           Up 15 days'),T('cache        Up 15 days')],trig:['diag']},
+'docker logs --tail 20 api-backend':{out:[T('DEBUG: Request GET /api/health — 200 — 2ms'),T('DEBUG: Request GET /api/health — 200 — 1ms'),T('DEBUG: Request GET /api/health — 200 — 2ms'),T('⚠ Health check logué en DEBUG toutes les secondes !','warn')],trig:['find']},
+'docker inspect api-backend | grep LogPath':{out:[T('"LogPath": "/var/lib/docker/containers/a3f8b2c1-xxx-json.log"','info'),T('→ Ce fichier fait 32GB','error')],trig:['find']},
+'truncate -s 0 /var/lib/docker/containers/a3f8b2c1-xxx-json.log':{out:[T('Log file truncated: 32GB → 0','success')],trig:['fix'],log:L('success','Logs vidés: +32GB'),mu:{'Disque':34,'Logs size':0}},
+'nano /etc/docker/daemon.json':{out:[T('Ajout config log rotation:','success'),T('  "log-driver": "json-file"'),T('  "log-opts": {"max-size":"10m","max-file":"3"}'),T('Sauvegardé.','success')],trig:['fix'],log:L('success','Log rotation configurée')},
+'systemctl restart docker':{out:[T('Docker daemon restarted','success'),T('Log limits applied to new containers','success')],trig:['fix'],log:L('success','Docker redémarré avec limits')},
+'hint':{out:[T('💡 1. du -sh /var/lib/docker/containers/*','info'),T('2. docker logs --tail pour voir le contenu'),T('3. truncate pour vider le fichier'),T('4. Configurer daemon.json pour le log rotation')]}
+},
+{
+'df -h':{out:[T('/dev/sda1  50G  15G  35G  30% /','success')],trig:['verify']},
+'du -sh /var/lib/docker/containers/*':{out:[T('0  a3f8b2c1-json.log','success')],trig:['verify']}
+}));
+
+// ============================================================
+// K8S 1: Pod CrashLoopBackOff
+// ============================================================
+SC.push(S('k8crash','k8s','Pod en CrashLoopBackOff','Un pod redémarre en boucle dans le cluster.','medium','Moyen',
+{'Pod status':{v:0,max:1,u:'CRASH'},'Restarts':{v:23,max:30,u:'x'},'Replicas OK':{v:0,max:3,u:'/3'}},
+[O('diag','Identifier le pod en erreur'),O('find','Trouver la cause du crash'),O('fix','Corriger et redéployer'),O('verify','Vérifier le déploiement')],
+[L('error','ALERT: Pod api-backend-xxx CrashLoopBackOff'),L('error','23 restarts in 30 minutes'),L('info','On-call notified')],
+[T('🚨 INCIDENT P2 — Pod Kubernetes en crash loop','system'),T('Le pod api-backend redémarre sans cesse.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('kubectl get pods        — Lister les pods'),T('kubectl describe pod api-backend-xxx'),T('kubectl logs api-backend-xxx'),T('kubectl logs api-backend-xxx --previous'),T('kubectl get configmap   — ConfigMaps'),T('kubectl describe configmap api-config'),T('kubectl edit configmap api-config'),T('kubectl rollout restart deployment api-backend'),T('kubectl get events      — Événements récents'),T('hint                    — Indice')]},
+'kubectl get pods':{out:[T('NAME                    READY  STATUS             RESTARTS'),T('api-backend-7f8d9-abc   0/1    CrashLoopBackOff   23','error'),T('api-backend-7f8d9-def   0/1    CrashLoopBackOff   21','error'),T('api-backend-7f8d9-ghi   0/1    CrashLoopBackOff   22','error'),T('db-stateful-0           1/1    Running            0')],trig:['diag']},
+'kubectl describe pod api-backend-xxx':{out:[T('Status: CrashLoopBackOff'),T('Last State: Terminated — Exit Code: 1'),T('Restart Count: 23','error'),T('Environment:'),T('  DB_HOST: <set from configmap api-config>'),T('Events:'),T('  Back-off restarting failed container','error')],trig:['diag']},
+'kubectl logs api-backend-xxx':{out:[T('Error: Configuration key "DB_HOST" is empty','error'),T('Database connection string is required','error'),T('Process exiting...','error')],trig:['find'],log:L('warn','Cause: DB_HOST vide dans ConfigMap')},
+'kubectl logs api-backend-xxx --previous':{out:[T('Error: Configuration key "DB_HOST" is empty','error')],trig:['find']},
+'kubectl get configmap':{out:[T('NAME         DATA'),T('api-config   3')],trig:['find']},
+'kubectl describe configmap api-config':{out:[T('Data:'),T('  DB_PORT: 5432'),T('  DB_NAME: production'),T('  DB_HOST:          ← VIDE !','error')],trig:['find'],log:L('warn','ConfigMap: DB_HOST est vide')},
+'kubectl get events':{out:[T('Pod api-backend: Back-off restarting (x23)','error')],trig:['diag']},
+'kubectl edit configmap api-config':{out:[T('Correction: DB_HOST=db-stateful-0.db-svc','success'),T('ConfigMap updated','success')],trig:['fix'],log:L('success','ConfigMap corrigé: DB_HOST')},
+'kubectl rollout restart deployment api-backend':{out:[T('deployment.apps/api-backend restarted','success'),T('Rolling out new pods...','info')],trig:['fix'],log:L('success','Deployment redémarré'),mu:{'Pod status':1,'Restarts':0,'Replicas OK':3}},
+'hint':{out:[T('💡 1. kubectl get pods pour le status','info'),T('2. kubectl logs pour la cause'),T('3. kubectl describe configmap'),T('4. kubectl edit configmap + rollout restart')]}
+},
+{
+'kubectl get pods':{out:[T('api-backend-8a2e1-abc  1/1  Running  0','success'),T('api-backend-8a2e1-def  1/1  Running  0','success'),T('api-backend-8a2e1-ghi  1/1  Running  0','success')],trig:['verify']}
+}));
+
+// ============================================================
+// K8S 2: Service selector mismatch
+// ============================================================
+SC.push(S('k8svc','k8s','Service n\'atteint pas le pod','Le Service Kubernetes ne route pas le trafic vers les pods.','medium','Moyen',
+{'Endpoints':{v:0,max:3,u:'/3'},'Traffic':{v:0,max:100,u:'%'},'Pods':{v:3,max:3,u:'UP'}},
+[O('diag','Identifier le problème de routing'),O('find','Trouver le selector mismatch'),O('fix','Corriger le Service'),O('verify','Vérifier le trafic')],
+[L('error','ALERT: Service api-svc has no endpoints'),L('warn','Pods are running but unreachable via Service'),L('info','On-call notified')],
+[T('🚨 INCIDENT P2 — Service K8s sans endpoints','system'),T('Les pods tournent mais le Service ne les atteint pas.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('kubectl get pods --show-labels'),T('kubectl get svc api-svc'),T('kubectl describe svc api-svc'),T('kubectl get endpoints api-svc'),T('kubectl edit svc api-svc'),T('kubectl get pods -l app=api-backend'),T('hint                    — Indice')]},
+'kubectl get pods --show-labels':{out:[T('NAME                    STATUS   LABELS'),T('api-backend-abc         Running  app=api-backend, version=v2','info'),T('api-backend-def         Running  app=api-backend, version=v2'),T('api-backend-ghi         Running  app=api-backend, version=v2')],trig:['diag']},
+'kubectl get svc api-svc':{out:[T('NAME     TYPE       CLUSTER-IP   PORT(S)    SELECTOR'),T('api-svc  ClusterIP  10.96.0.44   80:3000    app=api','warn')],trig:['diag']},
+'kubectl describe svc api-svc':{out:[T('Name: api-svc'),T('Selector: app=api','error'),T('Endpoints: <none>','error'),T(''),T('⚠ Selector "app=api" ne match aucun pod !','warn'),T('Les pods ont le label "app=api-backend"','info')],trig:['find'],log:L('warn','Selector mismatch: svc=api, pods=api-backend')},
+'kubectl get endpoints api-svc':{out:[T('NAME     ENDPOINTS'),T('api-svc  <none>','error')],trig:['find']},
+'kubectl get pods -l app=api-backend':{out:[T('3 pods found with label app=api-backend','success')]},
+'kubectl get pods -l app=api':{out:[T('No resources found','error')]},
+'kubectl edit svc api-svc':{out:[T('Correction: selector app=api → app=api-backend','success'),T('Service updated','success')],trig:['fix'],log:L('success','Selector corrigé'),mu:{'Endpoints':3,'Traffic':100}},
+'hint':{out:[T('💡 1. kubectl get pods --show-labels','info'),T('2. kubectl describe svc pour le selector'),T('3. Comparer les labels pods vs selector'),T('4. kubectl edit svc pour corriger')]}
+},
+{
+'kubectl get endpoints api-svc':{out:[T('api-svc  10.244.0.5:3000,10.244.0.6:3000,10.244.0.7:3000','success')],trig:['verify']},
+'kubectl describe svc api-svc':{out:[T('Selector: app=api-backend','success'),T('Endpoints: 3','success')],trig:['verify']}
+}));
+
+// ============================================================
+// K8S 3: PVC stuck Pending
+// ============================================================
+SC.push(S('k8pvc','k8s','PVC stuck en Pending','Un PersistentVolumeClaim ne se lie à aucun volume.','medium','Moyen',
+{'PVC status':{v:0,max:1,u:'PENDING'},'Pod':{v:0,max:1,u:'WAITING'},'Storage':{v:0,max:100,u:'%'}},
+[O('diag','Identifier le PVC en Pending'),O('find','Trouver pourquoi il ne se lie pas'),O('fix','Corriger le StorageClass'),O('verify','Vérifier le binding')],
+[L('error','ALERT: PVC db-data stuck in Pending'),L('error','Pod db-0 cannot start without volume'),L('info','On-call notified')],
+[T('🚨 INCIDENT P2 — PVC en Pending','system'),T('Le pod de base de données attend un volume.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('kubectl get pvc         — PersistentVolumeClaims'),T('kubectl describe pvc db-data'),T('kubectl get pv          — PersistentVolumes'),T('kubectl get sc          — StorageClasses'),T('kubectl get pods'),T('kubectl describe pod db-0'),T('kubectl edit pvc db-data'),T('kubectl apply -f pvc-fix.yaml'),T('hint                    — Indice')]},
+'kubectl get pvc':{out:[T('NAME     STATUS    VOLUME  CAPACITY  STORAGECLASS'),T('db-data  Pending   -       -         fast-ssd','error')],trig:['diag']},
+'kubectl describe pvc db-data':{out:[T('Status: Pending'),T('StorageClass: fast-ssd','warn'),T('Events:'),T('  no persistent volumes available for this claim','error'),T('  storageclass "fast-ssd" not found','error')],trig:['find'],log:L('warn','StorageClass "fast-ssd" n\'existe pas')},
+'kubectl get pv':{out:[T('No PersistentVolumes found'),T('(provisioner dynamique dépend du StorageClass)')],trig:['diag']},
+'kubectl get sc':{out:[T('NAME        PROVISIONER         DEFAULT'),T('standard    kubernetes.io/gce   true'),T('⚠ Pas de StorageClass "fast-ssd"','error')],trig:['find']},
+'kubectl get pods':{out:[T('db-0  0/1  Pending  — waiting for PVC','error')],trig:['diag']},
+'kubectl describe pod db-0':{out:[T('Status: Pending'),T('Events: pod has unbound PersistentVolumeClaims','error')]},
+'kubectl edit pvc db-data':{out:[T('Correction: storageClassName: fast-ssd → standard','success'),T('PVC updated','success')],trig:['fix'],log:L('success','StorageClass corrigé → standard')},
+'kubectl apply -f pvc-fix.yaml':{out:[T('PVC db-data patched: storageClass=standard','success')],trig:['fix'],log:L('success','PVC corrigé via YAML'),mu:{'PVC status':1,'Pod':1,'Storage':100}},
+'hint':{out:[T('💡 1. kubectl get pvc pour le status','info'),T('2. kubectl describe pvc pour l\'événement'),T('3. kubectl get sc pour les StorageClasses dispo'),T('4. kubectl edit pvc pour corriger')]}
+},
+{
+'kubectl get pvc':{out:[T('db-data  Bound  pvc-abc123  10Gi  standard','success')],trig:['verify']},
+'kubectl get pods':{out:[T('db-0  1/1  Running  0','success')],trig:['verify']}
+}));
+
+// ============================================================
+// K8S 4: ImagePullBackOff
+// ============================================================
+SC.push(S('k8img','k8s','ImagePullBackOff','Les pods ne démarrent pas car l\'image ne peut pas être téléchargée.','easy','Facile',
+{'Pods ready':{v:0,max:3,u:'/3'},'Image pull':{v:0,max:1,u:'FAIL'},'Deploy':{v:0,max:100,u:'%'}},
+[O('diag','Identifier l\'erreur ImagePull'),O('find','Trouver pourquoi l\'image échoue'),O('fix','Corriger l\'image ou le secret'),O('verify','Vérifier le déploiement')],
+[L('error','ALERT: Pods in ImagePullBackOff'),L('error','Failed to pull image'),L('info','Last deployment: 15 min ago')],
+[T('🚨 INCIDENT P2 — Image Docker introuvable','system'),T('Les pods ne peuvent pas pull l\'image.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('kubectl get pods'),T('kubectl describe pod api-backend-xxx'),T('kubectl get deployment api-backend -o yaml | grep image'),T('kubectl set image deployment/api-backend api=registry.company.com/api:v2.4'),T('kubectl get secrets'),T('kubectl rollout status deployment api-backend'),T('hint                    — Indice')]},
+'kubectl get pods':{out:[T('api-backend-abc  0/1  ImagePullBackOff  0','error'),T('api-backend-def  0/1  ImagePullBackOff  0','error'),T('api-backend-ghi  0/1  ErrImagePull      0','error')],trig:['diag']},
+'kubectl describe pod api-backend-xxx':{out:[T('Image: registry.company.com/api:v2.5','warn'),T('Events:'),T('  Failed to pull image: manifest for v2.5 not found','error'),T('  tag "v2.5" does not exist in repository','error'),T('  Back-off pulling image','error')],trig:['find'],log:L('warn','Image tag v2.5 n\'existe pas')},
+'kubectl get deployment api-backend -o yaml | grep image':{out:[T('image: registry.company.com/api:v2.5','error'),T('⚠ Le tag v2.5 n\'a pas encore été pushé','warn')],trig:['find']},
+'kubectl get secrets':{out:[T('NAME              TYPE'),T('registry-creds    kubernetes.io/dockerconfigjson'),T('→ Secret registry OK')],trig:['find']},
+'kubectl set image deployment/api-backend api=registry.company.com/api:v2.4':{out:[T('deployment.apps/api-backend image updated to v2.4','success'),T('Rolling update started...','info')],trig:['fix'],log:L('success','Image rollback vers v2.4'),mu:{'Pods ready':3,'Image pull':1,'Deploy':100}},
+'kubectl rollout status deployment api-backend':{dyn:true},
+'hint':{out:[T('💡 1. kubectl describe pod pour l\'erreur','info'),T('2. Vérifier le tag d\'image (existe-t-il ?)'),T('3. kubectl set image pour rollback au bon tag'),T('4. kubectl rollout status pour suivre')]}
+},
+{
+'kubectl get pods':{out:[T('api-backend-new-abc  1/1  Running  0','success'),T('api-backend-new-def  1/1  Running  0','success'),T('api-backend-new-ghi  1/1  Running  0','success')],trig:['verify']},
+'kubectl rollout status deployment api-backend':{out:[T('deployment "api-backend" successfully rolled out','success')],trig:['verify']}
+}));
+
+// ============================================================
+// K8S 5: OOMKilled
+// ============================================================
+SC.push(S('k8oom','k8s','Pod OOMKilled','Les pods sont tués car ils dépassent la limite mémoire.','medium','Moyen',
+{'Pods alive':{v:0,max:3,u:'/3'},'OOM events':{v:12,max:15,u:''},'Memory':{v:100,max:100,u:'%'}},
+[O('diag','Identifier les pods OOMKilled'),O('find','Analyser l\'usage mémoire'),O('fix','Augmenter les limits'),O('verify','Vérifier la stabilité')],
+[L('error','ALERT: Pods OOMKilled repeatedly'),L('error','Memory limit exceeded'),L('warn','Requests/limits may be too low'),L('info','On-call notified')],
+[T('🚨 INCIDENT P2 — Pods OOMKilled','system'),T('Les pods sont tués pour dépassement mémoire.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('kubectl get pods'),T('kubectl describe pod api-backend-xxx'),T('kubectl top pods        — Usage mémoire/CPU'),T('kubectl get deployment api-backend -o yaml | grep -A5 resources'),T('kubectl edit deployment api-backend'),T('kubectl rollout status deployment api-backend'),T('hint                    — Indice')]},
+'kubectl get pods':{out:[T('api-backend-abc  0/1  OOMKilled   12','error'),T('api-backend-def  0/1  OOMKilled   11','error'),T('api-backend-ghi  1/1  Running     10','warn')],trig:['diag']},
+'kubectl describe pod api-backend-xxx':{out:[T('State: Terminated — Reason: OOMKilled','error'),T('Last State: OOMKilled — Exit Code: 137'),T('Limits:  memory: 128Mi','warn'),T('Requests: memory: 64Mi')],trig:['find'],log:L('warn','Limit mémoire: 128Mi — trop bas')},
+'kubectl top pods':{out:[T('NAME                CPU   MEMORY'),T('api-backend-ghi     50m   124Mi / 128Mi','error'),T('→ Presque à la limite !','warn')],trig:['find']},
+'kubectl get deployment api-backend -o yaml | grep -A5 resources':{out:[T('resources:'),T('  requests:'),T('    memory: 64Mi'),T('    cpu: 50m'),T('  limits:'),T('    memory: 128Mi    ← Trop bas !','error'),T('    cpu: 200m')],trig:['find']},
+'kubectl edit deployment api-backend':{out:[T('Correction: limits.memory 128Mi → 512Mi','success'),T('Correction: requests.memory 64Mi → 256Mi','success'),T('Deployment updated, rolling out...','success')],trig:['fix'],log:L('success','Memory limits augmentés à 512Mi'),mu:{'Pods alive':3,'OOM events':0,'Memory':50}},
+'kubectl rollout status deployment api-backend':{dyn:true},
+'hint':{out:[T('💡 1. kubectl describe pod pour OOMKilled','info'),T('2. kubectl top pods pour l\'usage réel'),T('3. Comparer usage vs limits'),T('4. kubectl edit deployment pour augmenter')]}
+},
+{
+'kubectl get pods':{out:[T('api-backend-new-abc  1/1  Running  0','success'),T('api-backend-new-def  1/1  Running  0','success'),T('api-backend-new-ghi  1/1  Running  0','success')],trig:['verify']},
+'kubectl top pods':{out:[T('api-backend-new-abc  45m  198Mi/512Mi','success')],trig:['verify']},
+'kubectl rollout status deployment api-backend':{out:[T('deployment successfully rolled out','success')],trig:['verify']}
+}));
+
+// ============================================================
+// DB 1: Connexions saturées
+// ============================================================
+SC.push(S('dbconn','db','Connexions DB saturées','PostgreSQL à 98/100 connexions, requêtes bloquées.','medium','Moyen',
+{'Temps réponse':{v:12000,max:15000,u:'ms'},'Connexions':{v:98,max:100,u:'/100'},'CPU DB':{v:97,max:100,u:'%'}},
+[O('diag','Diagnostiquer la surcharge'),O('find','Trouver la requête bloquante'),O('fix','Libérer et créer l\'index'),O('verify','Vérifier le retour normal')],
+[L('error','ALERT: PostgreSQL 98/100 connections'),L('error','API response > 10s'),L('info','On-call notified')],
+[T('🚨 INCIDENT P1 — DB saturée','system'),T('PostgreSQL est à 98 connexions sur 100.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('pg_stat                 — Stats connexions'),T('pg_slow_queries         — Requêtes lentes'),T('pg_locks                — Verrous actifs'),T('explain_query           — EXPLAIN ANALYZE'),T('pg_kill_slow            — Tuer les requêtes lentes'),T('create_index            — Créer index manquant'),T('top                     — Processus'),T('curl api.company.com/health'),T('hint                    — Indice')]},
+'top':{out:[T('load average: 18.72'),T('%Cpu: 97.2%','error'),T('PID 3842 postgres 45.2% SELECT waiting','error')],trig:['diag']},
+'pg_stat':{out:[T('Total: 98/100 | Active: 47 | Waiting: 38','error'),T('Longest query: 847s','error'),T('Avg time: 23.4s (normal: 50ms)','warn')],trig:['diag']},
+'pg_locks':{out:[T('PID 3842: ExclusiveLock on "orders" — 847s','error'),T('   ↳ 38 queries WAITING','error')],trig:['find']},
+'pg_slow_queries':{out:[T('PID 3842 | 847s | SELECT * FROM orders','error'),T('  WHERE created_at > \'2025-01-01\'','error'),T('  → Seq Scan 2.4M rows — NO INDEX','error')],trig:['find'],log:L('warn','Full scan orders 2.4M rows sans index')},
+'explain_query':{out:[T('Seq Scan on orders (rows=2400000)','error'),T('Execution Time: STILL RUNNING...','error'),T('⚠ Aucun index sur (created_at, status)','warn')],trig:['find']},
+'pg_kill_slow':{out:[T('PID 3842, 3901, 3955 terminated','success'),T('38 blocked queries released','success')],trig:['fix'],log:L('success','Requêtes lentes terminées'),mu:{'Connexions':12,'CPU DB':35}},
+'create_index':{out:[T('CREATE INDEX CONCURRENTLY idx_orders_created_status','info'),T('Building... ████████████████████ 100%'),T('INDEX CREATED — Before: ~850s → After: ~45ms','success')],trig:['fix'],log:L('success','Index créé'),mu:{'Temps réponse':48,'Connexions':8,'CPU DB':12}},
+'hint':{out:[T('💡 1. pg_stat pour les connexions','info'),T('2. pg_slow_queries / pg_locks'),T('3. pg_kill_slow pour libérer'),T('4. create_index pour corriger durablement')]}
+},
+{
+'curl api.company.com/health':{out:[T('{"status":"healthy","db_time":"45ms"}','success')],trig:['verify']},
+'pg_stat':{out:[T('Total: 8/100 | Avg: 45ms ✓','success')],trig:['verify']}
+}));
+
+// ============================================================
+// DB 2: Requête lente / deadlock
+// ============================================================
+SC.push(S('dblock','db','Deadlock en base','Deux transactions se bloquent mutuellement, l\'app freeze.','hard','Expert',
+{'Transactions':{v:2,max:2,u:'LOCKED'},'App':{v:0,max:100,u:'%'},'Queries blocked':{v:45,max:50,u:''}},
+[O('diag','Identifier le deadlock'),O('find','Analyser les transactions'),O('fix','Résoudre le deadlock'),O('verify','Vérifier le déblocage')],
+[L('error','ALERT: Deadlock detected in PostgreSQL'),L('error','45 queries blocked'),L('warn','Application freezed'),L('info','On-call notified')],
+[T('🚨 INCIDENT P1 — Deadlock base de données','system'),T('Deux transactions se bloquent mutuellement.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('pg_stat                 — Stats'),T('pg_locks                — Verrous/deadlocks'),T('pg_deadlock_detail      — Analyse deadlock'),T('pg_kill <pid>           — Terminer transaction'),T('pg_kill 5501            — Kill PID 5501'),T('pg_kill 5502            — Kill PID 5502'),T('hint                    — Indice')]},
+'pg_stat':{out:[T('Active: 47 | Waiting: 45 | Idle in tx: 2','error'),T('2 transactions in deadlock state','error')],trig:['diag']},
+'pg_locks':{out:[T('DEADLOCK DETECTED:','error'),T('PID 5501: holds ExclusiveLock on "users", wants lock on "orders"','error'),T('PID 5502: holds ExclusiveLock on "orders", wants lock on "users"','error'),T('→ Blocage circulaire !','warn')],trig:['find'],log:L('warn','Deadlock: PID 5501 ↔ PID 5502')},
+'pg_deadlock_detail':{out:[T('Transaction 5501: UPDATE users SET... → waiting for orders','error'),T('Transaction 5502: UPDATE orders SET... → waiting for users','error'),T('⚠ Ordre d\'acquisition des locks inversé','warn'),T('💡 Tuez l\'un des deux pour débloquer','info')],trig:['find']},
+'pg_kill 5501':{out:[T('Transaction 5501 terminated','success'),T('PID 5502 unblocked — completing','success'),T('45 waiting queries released','success')],trig:['fix'],log:L('success','Deadlock résolu: PID 5501 tué'),mu:{'Transactions':0,'App':100,'Queries blocked':0}},
+'pg_kill 5502':{out:[T('Transaction 5502 terminated','success'),T('PID 5501 unblocked — completing','success'),T('45 waiting queries released','success')],trig:['fix'],log:L('success','Deadlock résolu: PID 5502 tué'),mu:{'Transactions':0,'App':100,'Queries blocked':0}},
+'hint':{out:[T('💡 1. pg_locks pour détecter le deadlock','info'),T('2. pg_deadlock_detail pour comprendre'),T('3. pg_kill <pid> sur l\'une des transactions')]}
+},
+{
+'pg_stat':{out:[T('Active: 5 | Waiting: 0 | No deadlocks','success')],trig:['verify']},
+'pg_locks':{out:[T('No deadlocks detected ✓','success')],trig:['verify']}
+}));
+
+// ============================================================
+// DB 3: Réplication cassée
+// ============================================================
+SC.push(S('dbrepl','db','Réplication MySQL cassée','Le slave MySQL est en retard de 45000 secondes.','hard','Expert',
+{'Repl lag':{v:45000,max:50000,u:'s'},'Slave status':{v:0,max:1,u:'FAIL'},'Read consistency':{v:20,max:100,u:'%'}},
+[O('diag','Vérifier le status de réplication'),O('find','Identifier l\'erreur'),O('fix','Réparer la réplication'),O('verify','Vérifier la synchro')],
+[L('error','ALERT: MySQL replication lag > 12 hours'),L('error','Slave SQL thread stopped'),L('warn','Read replicas serving stale data'),L('info','On-call notified')],
+[T('🚨 INCIDENT P1 — Réplication MySQL cassée','system'),T('Le slave est 12h en retard, données incohérentes.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('show slave status        — Status réplication'),T('show master status       — Status master'),T('show slave error         — Détail erreur'),T('skip_error               — Sauter l\'erreur'),T('stop slave               — Stopper réplication'),T('start slave              — Démarrer réplication'),T('reset_and_resync         — Resync complète'),T('hint                     — Indice')]},
+'show slave status':{out:[T('Slave_IO_Running: Yes'),T('Slave_SQL_Running: No','error'),T('Seconds_Behind_Master: 45000','error'),T('Last_SQL_Error: Error 1062 Duplicate entry \'4857\' for key PRIMARY','error')],trig:['diag'],log:L('warn','SQL Thread stoppé: duplicate key 4857')},
+'show master status':{out:[T('File: mysql-bin.004521'),T('Position: 8847523'),T('→ Master fonctionne normalement')],trig:['diag']},
+'show slave error':{out:[T('Error 1062: Duplicate entry \'4857\' for key \'users.PRIMARY\'','error'),T('Query: INSERT INTO users (id, name) VALUES (4857, \'John\')','error'),T('→ Cet ID existe déjà sur le slave','warn')],trig:['find']},
+'skip_error':{out:[T('SET GLOBAL sql_slave_skip_counter = 1;','info'),T('Error skipped','success')],trig:['fix'],log:L('success','Erreur duplicate key skippée')},
+'stop slave':{out:[T('Slave stopped','info')]},
+'start slave':{out:[T('Slave started','success'),T('Replication resuming...','info')],trig:['fix'],log:L('success','Réplication reprise'),mu:{'Slave status':1,'Repl lag':120,'Read consistency':95}},
+'reset_and_resync':{out:[T('Stopping slave...','info'),T('Dumping master data...','info'),T('Importing to slave... ████████████████ 100%'),T('Configuring CHANGE MASTER TO...','info'),T('Starting slave...','success'),T('Replication fully resynced','success')],trig:['fix'],log:L('success','Resync complète effectuée'),mu:{'Slave status':1,'Repl lag':0,'Read consistency':100}},
+'hint':{out:[T('💡 1. show slave status pour l\'erreur','info'),T('2. show slave error pour le détail'),T('3. skip_error ou reset_and_resync'),T('4. start slave pour reprendre')]}
+},
+{
+'show slave status':{out:[T('Slave_IO_Running: Yes','success'),T('Slave_SQL_Running: Yes','success'),T('Seconds_Behind_Master: 0','success')],trig:['verify']}
+}));
+
+// ============================================================
+// DB 4: Backup qui échoue
+// ============================================================
+SC.push(S('dbbak','db','Backup qui échoue','Le backup nocturne échoue silencieusement depuis 7 jours.','medium','Moyen',
+{'Dernier backup':{v:7,max:7,u:'j ago'},'Espace backup':{v:100,max:100,u:'%'},'RPO':{v:0,max:100,u:'RISK'}},
+[O('diag','Vérifier les backups récents'),O('find','Identifier la cause d\'échec'),O('fix','Corriger et relancer le backup'),O('verify','Vérifier le backup')],
+[L('error','ALERT: No successful backup since 7 days'),L('warn','Backup disk at 100%'),L('info','RPO violated — data at risk')],
+[T('🚨 INCIDENT P2 — Backups échouent depuis 7 jours','system'),T('Aucun backup réussi, données à risque.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('ls -lh /backup/          — Lister backups'),T('cat /var/log/backup.log  — Logs backup'),T('df -h /backup            — Espace disque backup'),T('du -sh /backup/*         — Taille par backup'),T('rm /backup/old_*.sql.gz  — Supprimer anciens'),T('pg_dump_backup           — Lancer backup manuel'),T('crontab -l               — Voir le cron'),T('hint                     — Indice')]},
+'ls -lh /backup/':{out:[T('-rw-r--r-- 2.1G backup_20260201.sql.gz'),T('-rw-r--r-- 2.1G backup_20260202.sql.gz'),T('-rw-r--r-- 2.1G backup_20260203.sql.gz'),T('-rw-r--r-- 2.1G backup_20260204.sql.gz'),T('-rw-r--r-- 2.1G backup_20260205.sql.gz'),T('⚠ Pas de backup après le 5 février','warn')],trig:['diag']},
+'cat /var/log/backup.log':{out:[T('[Feb 06 02:00] Starting backup...'),T('[Feb 06 02:00] ERROR: No space left on device','error'),T('[Feb 07 02:00] Starting backup...'),T('[Feb 07 02:00] ERROR: No space left on device','error'),T('... same error every night','error')],trig:['find'],log:L('warn','Backup échoue: disque plein')},
+'df -h /backup':{out:[T('/dev/sdb1  10G  10G  0  100% /backup','error')],trig:['find']},
+'du -sh /backup/*':{out:[T('2.1G each × 5 files = 10.5G total','error'),T('⚠ Pas de rotation des anciens backups !','warn')],trig:['find']},
+'rm /backup/old_*.sql.gz':{out:[T('Commande pas exacte. Utilisez: rm /backup/backup_202602{01,02,03}.sql.gz','info')]},
+'rm /backup/backup_20260201.sql.gz':{out:[T('Deleted: 2.1G freed','success')],trig:['fix'],log:L('success','Ancien backup supprimé')},
+'rm /backup/backup_20260202.sql.gz':{out:[T('Deleted: 2.1G freed','success')],trig:['fix']},
+'rm /backup/backup_20260203.sql.gz':{out:[T('Deleted: 2.1G freed','success')],trig:['fix'],mu:{'Espace backup':37}},
+'pg_dump_backup':{out:[T('pg_dump production | gzip > /backup/backup_20260212.sql.gz','info'),T('Backup in progress... ████████████████ 100%'),T('Backup completed: 2.1G','success')],trig:['fix'],log:L('success','Backup manuel réussi'),mu:{'Dernier backup':0,'RPO':100}},
+'crontab -l':{out:[T('0 2 * * * /opt/backup.sh'),T('⚠ Pas de rotation automatique dans le script','warn')]},
+'hint':{out:[T('💡 1. cat /var/log/backup.log pour l\'erreur','info'),T('2. df -h /backup pour l\'espace'),T('3. Supprimer les anciens backups'),T('4. pg_dump_backup pour relancer')]}
+},
+{
+'ls -lh /backup/':{out:[T('backup_20260204.sql.gz  2.1G'),T('backup_20260205.sql.gz  2.1G'),T('backup_20260212.sql.gz  2.1G  ← NOUVEAU','success')],trig:['verify']},
+'df -h /backup':{out:[T('/dev/sdb1  10G  6.3G  3.7G  63% /backup','success')],trig:['verify']}
+}));
+
+// ============================================================
+// SEC 1: Certificat SSL expiré
+// ============================================================
+SC.push(S('ssl','sec','Certificat SSL expiré','Le site affiche des erreurs HTTPS, les clients refusent la connexion.','medium','Moyen',
+{'HTTPS':{v:0,max:1,u:'FAIL'},'Cert validity':{v:0,max:1,u:'EXPIRED'},'Users impactés':{v:8500,max:10000,u:''}},
+[O('diag','Vérifier le certificat'),O('find','Identifier quel cert est expiré'),O('fix','Renouveler le certificat'),O('verify','Vérifier HTTPS')],
+[L('error','ALERT: SSL certificate expired'),L('error','HTTPS connections failing'),L('info','On-call notified')],
+[T('🚨 INCIDENT P1 — Certificat SSL expiré','system'),T('Les navigateurs affichent des erreurs de sécurité.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('openssl s_client -connect localhost:443'),T('openssl x509 -in /etc/ssl/company.crt -dates'),T('curl https://company.com'),T('certbot renew            — Renouveler Let\'s Encrypt'),T('certbot certificates     — Lister les certs'),T('systemctl reload nginx   — Recharger Nginx'),T('cat /etc/nginx/sites-enabled/default'),T('hint                     — Indice')]},
+'curl https://company.com':{out:[T('curl: (60) SSL certificate problem: certificate has expired','error')],trig:['diag']},
+'openssl s_client -connect localhost:443':{out:[T('CONNECTED(00000003)'),T('depth=0 CN = company.com'),T('verify error:num=10:certificate has expired','error'),T('Not After : Feb 10 23:59:59 2026 GMT','error'),T('→ Expiré il y a 2 jours !','warn')],trig:['find'],log:L('warn','Cert expiré depuis le 10 février')},
+'openssl x509 -in /etc/ssl/company.crt -dates':{out:[T('notBefore=Feb 10 00:00:00 2025 GMT'),T('notAfter=Feb 10 23:59:59 2026 GMT','error'),T('⚠ EXPIRÉ','error')],trig:['find']},
+'certbot certificates':{out:[T('Certificate Name: company.com'),T('Expiry Date: 2026-02-10 (EXPIRED)','error'),T('Certificate Path: /etc/letsencrypt/live/company.com/fullchain.pem')],trig:['find']},
+'cat /etc/nginx/sites-enabled/default':{out:[T('ssl_certificate /etc/letsencrypt/live/company.com/fullchain.pem;'),T('ssl_certificate_key /etc/letsencrypt/live/company.com/privkey.pem;')]},
+'certbot renew':{out:[T('Renewing certificate for company.com...','info'),T('New certificate issued:','success'),T('  Valid until: 2026-05-13','success'),T('Cert saved to /etc/letsencrypt/live/company.com/','success')],trig:['fix'],log:L('success','Certificat renouvelé jusqu\'au 13 mai'),mu:{'Cert validity':1}},
+'systemctl reload nginx':{out:[T('Nginx reloaded with new certificate','success')],trig:['fix'],log:L('success','Nginx rechargé'),mu:{'HTTPS':1,'Users impactés':0}},
+'hint':{out:[T('💡 1. openssl s_client pour vérifier','info'),T('2. certbot certificates pour les détails'),T('3. certbot renew pour renouveler'),T('4. systemctl reload nginx pour appliquer')]}
+},
+{
+'curl https://company.com':{out:[T('HTTP/2 200 OK','success'),T('SSL: TLS 1.3, valid certificate','success')],trig:['verify']},
+'openssl s_client -connect localhost:443':{out:[T('Verify return code: 0 (ok)','success')],trig:['verify']}
+}));
+
+// ============================================================
+// SEC 2: Brute force SSH
+// ============================================================
+SC.push(S('brute','sec','Brute force SSH','Des milliers de tentatives de connexion SSH suspectes.','medium','Moyen',
+{'Tentatives/h':{v:4500,max:5000,u:''},'IPs suspectes':{v:12,max:15,u:''},'Fail2ban':{v:0,max:1,u:'OFF'}},
+[O('diag','Détecter l\'attaque brute force'),O('find','Identifier les IPs attaquantes'),O('fix','Bloquer et sécuriser'),O('verify','Vérifier le blocage')],
+[L('error','ALERT: 4500 failed SSH attempts/hour'),L('warn','Multiple IPs targeting port 22'),L('info','On-call notified')],
+[T('🚨 INCIDENT P2 — Brute force SSH détecté','system'),T('Des milliers de tentatives de connexion échouent.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('cat /var/log/auth.log | grep Failed'),T('grep -c "Failed password" /var/log/auth.log'),T('awk_top_attackers        — Top IPs attaquantes'),T('fail2ban-client status   — Status fail2ban'),T('systemctl start fail2ban — Démarrer fail2ban'),T('fail2ban-client status sshd'),T('iptables -L              — Règles firewall'),T('iptables_block_ips       — Bloquer les top IPs'),T('hint                     — Indice')]},
+'cat /var/log/auth.log | grep Failed':{out:[T('Failed password for root from 185.234.72.x port 4521','error'),T('Failed password for admin from 185.234.72.x port 4522','error'),T('Failed password for root from 91.240.118.x port 3311','error'),T('... 4500+ entries in last hour','error')],trig:['diag']},
+'grep -c "Failed password" /var/log/auth.log':{out:[T('4,523 failed attempts in last hour','error')],trig:['diag']},
+'awk_top_attackers':{out:[T('=== TOP ATTACKING IPs ===','info'),T('2,841  185.234.72.14   (Russia)','error'),T('  987  91.240.118.203  (China)','error'),T('  412  45.148.10.78    (Unknown)','warn'),T('  283  Other IPs')],trig:['find'],log:L('warn','Top attaquant: 185.234.72.14 (2841 tentatives)')},
+'fail2ban-client status':{out:[T('Status: inactive','error'),T('⚠ Fail2ban n\'est pas démarré !','warn')],trig:['find']},
+'systemctl start fail2ban':{out:[T('fail2ban started','success'),T('SSH jail activated','success')],trig:['fix'],log:L('success','Fail2ban démarré'),mu:{'Fail2ban':1}},
+'fail2ban-client status sshd':{dyn:true},
+'iptables -L':{out:[T('Chain INPUT (policy ACCEPT)'),T('⚠ Aucune règle de filtrage !','warn')],trig:['find']},
+'iptables_block_ips':{out:[T('Blocking 185.234.72.14...','info'),T('Blocking 91.240.118.203...','info'),T('Blocking 45.148.10.78...','info'),T('3 IPs blocked via iptables','success')],trig:['fix'],log:L('success','3 IPs bloquées'),mu:{'Tentatives/h':12,'IPs suspectes':0}},
+'hint':{out:[T('💡 1. grep auth.log pour les tentatives','info'),T('2. awk_top_attackers pour les IPs'),T('3. systemctl start fail2ban'),T('4. iptables_block_ips pour bloquer')]}
+},
+{
+'fail2ban-client status sshd':{out:[T('Jail: sshd — Currently banned: 12','success'),T('Total banned: 12 | Total failed: 23','success')],trig:['verify']},
+'grep -c "Failed password" /var/log/auth.log':{out:[T('12 attempts in last 10 min (down from 4500/h)','success')],trig:['verify']}
+}));
+
+// ============================================================
+// SEC 3: Firewall bloque trafic légitime
+// ============================================================
+SC.push(S('fw','sec','Firewall bloque le trafic','Après un changement iptables, HTTP et SSH sont bloqués.','medium','Moyen',
+{'HTTP':{v:0,max:1,u:'BLOCKED'},'SSH ext':{v:0,max:1,u:'BLOCKED'},'Rules':{v:1,max:5,u:'DROP ALL'}},
+[O('diag','Identifier le blocage firewall'),O('find','Trouver la règle problématique'),O('fix','Corriger les règles'),O('verify','Vérifier l\'accès')],
+[L('error','ALERT: All external connections dropped'),L('error','HTTP and SSH unreachable'),L('warn','Recent iptables change detected'),L('info','Console access available')],
+[T('🚨 INCIDENT P1 — Firewall bloque tout','system'),T('Plus aucune connexion externe ne passe.','system'),T('Vous êtes sur la console physique.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('iptables -L -n          — Lister les règles'),T('iptables -L -n --line-numbers'),T('iptables -D INPUT 1     — Supprimer règle 1'),T('iptables -A INPUT -p tcp --dport 22 -j ACCEPT'),T('iptables -A INPUT -p tcp --dport 80 -j ACCEPT'),T('iptables -A INPUT -p tcp --dport 443 -j ACCEPT'),T('iptables -P INPUT ACCEPT — Policy ACCEPT'),T('iptables-save           — Sauvegarder'),T('curl localhost           — Test local'),T('hint                     — Indice')]},
+'iptables -L -n':{out:[T('Chain INPUT (policy DROP)','error'),T('num  target  prot  source       destination'),T('1    DROP    all   0.0.0.0/0    0.0.0.0/0','error'),T(''),T('⚠ Règle 1: DROP ALL — bloque TOUT le trafic entrant','error')],trig:['find'],log:L('warn','iptables: DROP ALL en première règle')},
+'iptables -L -n --line-numbers':{out:[T('Chain INPUT (policy DROP)'),T('1  DROP  all  --  0.0.0.0/0  0.0.0.0/0','error')],trig:['find']},
+'curl localhost':{out:[T('HTTP/1.1 200 OK','success'),T('→ Le serveur web fonctionne en local')],trig:['diag']},
+'iptables -D INPUT 1':{out:[T('Rule 1 (DROP all) deleted','success')],trig:['fix'],log:L('success','Règle DROP ALL supprimée')},
+'iptables -A INPUT -p tcp --dport 22 -j ACCEPT':{out:[T('Rule added: ACCEPT SSH (22)','success')],trig:['fix'],log:L('success','SSH autorisé'),mu:{'SSH ext':1}},
+'iptables -A INPUT -p tcp --dport 80 -j ACCEPT':{out:[T('Rule added: ACCEPT HTTP (80)','success')],trig:['fix'],mu:{'HTTP':1}},
+'iptables -A INPUT -p tcp --dport 443 -j ACCEPT':{out:[T('Rule added: ACCEPT HTTPS (443)','success')],trig:['fix']},
+'iptables -P INPUT ACCEPT':{out:[T('Default policy changed to ACCEPT','success')],trig:['fix'],mu:{'HTTP':1,'SSH ext':1,'Rules':5}},
+'iptables-save':{out:[T('Rules saved to /etc/iptables/rules.v4','success')],trig:['fix'],log:L('success','Règles sauvegardées')},
+'hint':{out:[T('💡 1. iptables -L -n pour voir les règles','info'),T('2. Trouver la règle DROP ALL'),T('3. iptables -D INPUT 1 pour la supprimer'),T('4. Ajouter les bonnes règles ACCEPT')]}
+},
+{
+'iptables -L -n':{out:[T('Chain INPUT (policy ACCEPT)'),T('ACCEPT tcp dpt:22','success'),T('ACCEPT tcp dpt:80','success'),T('ACCEPT tcp dpt:443','success')],trig:['verify']}
+}));
+
+// ============================================================
+// SEC 4: Sudo trop permissif
+// ============================================================
+SC.push(S('sudo','sec','Droits sudo trop permissifs','Un utilisateur a ALL=(ALL) NOPASSWD:ALL, risque de sécurité majeur.','easy','Facile',
+{'Risque':{v:95,max:100,u:'%'},'Users NOPASSWD':{v:3,max:5,u:''},'Compliance':{v:10,max:100,u:'%'}},
+[O('diag','Auditer les droits sudo'),O('find','Identifier les permissions dangereuses'),O('fix','Restreindre les droits'),O('verify','Vérifier la config')],
+[L('error','AUDIT: Users with NOPASSWD:ALL detected'),L('warn','Security compliance violation'),L('info','Security team notified')],
+[T('🚨 AUDIT SÉCURITÉ — Droits sudo excessifs','system'),T('Des utilisateurs ont des droits sudo trop larges.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('cat /etc/sudoers         — Config sudo'),T('cat /etc/sudoers.d/*     — Fichiers additionnels'),T('grep NOPASSWD /etc/sudoers'),T('visudo                   — Éditer sudoers'),T('nano /etc/sudoers.d/dev-team'),T('sudo -l -U deploy        — Droits d\'un user'),T('sudo -l -U intern        — Droits d\'un user'),T('hint                     — Indice')]},
+'cat /etc/sudoers':{out:[T('root ALL=(ALL:ALL) ALL'),T('%admin ALL=(ALL) ALL'),T(''),T('# Inclusions'),T('#includedir /etc/sudoers.d')],trig:['diag']},
+'cat /etc/sudoers.d/*':{out:[T('# /etc/sudoers.d/dev-team'),T('deploy ALL=(ALL) NOPASSWD: ALL','error'),T('intern ALL=(ALL) NOPASSWD: ALL','error'),T('jenkins ALL=(ALL) NOPASSWD: ALL','error'),T(''),T('⚠ 3 utilisateurs avec NOPASSWD:ALL !','warn')],trig:['find'],log:L('warn','3 users avec NOPASSWD:ALL: deploy, intern, jenkins')},
+'grep NOPASSWD /etc/sudoers':{out:[T('(no match in main sudoers, check sudoers.d/)','info')]},
+'sudo -l -U deploy':{out:[T('User deploy may run: (ALL) NOPASSWD: ALL','error'),T('⚠ Accès root complet sans mot de passe !','warn')],trig:['find']},
+'sudo -l -U intern':{out:[T('User intern may run: (ALL) NOPASSWD: ALL','error'),T('⚠ Un stagiaire avec accès root complet !','error')],trig:['find']},
+'visudo':{out:[T('Édition de /etc/sudoers...','info'),T('Pas de changements nécessaires ici — vérifiez sudoers.d/','info')]},
+'nano /etc/sudoers.d/dev-team':{out:[T('Correction:','success'),T('  deploy ALL=(ALL) NOPASSWD: /usr/bin/systemctl, /usr/bin/docker','success'),T('  jenkins ALL=(ALL) NOPASSWD: /opt/deploy.sh','success'),T('  # intern supprimé','success'),T('Sauvegardé.','success')],trig:['fix'],log:L('success','Sudo restreint: droits minimum'),mu:{'Risque':15,'Users NOPASSWD':0,'Compliance':95}},
+'hint':{out:[T('💡 1. cat /etc/sudoers.d/* pour voir','info'),T('2. sudo -l -U <user> pour auditer'),T('3. nano /etc/sudoers.d/dev-team pour corriger'),T('4. Principe du moindre privilège !')]}
+},
+{
+'cat /etc/sudoers.d/*':{out:[T('deploy: systemctl, docker only','success'),T('jenkins: /opt/deploy.sh only','success'),T('No NOPASSWD:ALL entries ✓','success')],trig:['verify']},
+'sudo -l -U intern':{out:[T('User intern is not allowed to run sudo','success')],trig:['verify']}
+}));
+
+// ============================================================
+// CICD 1: Pipeline qui échoue
+// ============================================================
+SC.push(S('pipe','cicd','Pipeline CI/CD échoue','Le pipeline de déploiement échoue depuis 2 jours.','medium','Moyen',
+{'Pipeline':{v:0,max:1,u:'FAIL'},'Deploys bloqués':{v:5,max:10,u:''},'Tests':{v:0,max:1,u:'FAIL'}},
+[O('diag','Identifier l\'étape en échec'),O('find','Trouver la cause root'),O('fix','Corriger le pipeline'),O('verify','Vérifier le build')],
+[L('error','ALERT: Pipeline #847 failed — stage: test'),L('error','5 deployments blocked'),L('info','Dev team notified')],
+[T('🚨 INCIDENT P3 — Pipeline CI/CD cassé','system'),T('Aucun déploiement possible depuis 2 jours.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('pipeline_status          — Status pipeline'),T('pipeline_logs            — Logs du dernier build'),T('cat .gitlab-ci.yml       — Config CI'),T('npm test                 — Lancer les tests'),T('npm install              — Installer dépendances'),T('cat package.json | grep jest'),T('nano .gitlab-ci.yml      — Éditer config CI'),T('pipeline_retry           — Relancer le pipeline'),T('hint                     — Indice')]},
+'pipeline_status':{out:[T('Pipeline #847 — Status: FAILED','error'),T('  ✓ Stage: build — passed'),T('  ✗ Stage: test — FAILED','error'),T('  ○ Stage: deploy — skipped')],trig:['diag']},
+'pipeline_logs':{out:[T('=== Stage: test ==='),T('$ npm test'),T('Error: Cannot find module \'@testing-library/react\'','error'),T('Module not found in node_modules/','error'),T(''),T('Tests failed with exit code 1','error')],trig:['find'],log:L('warn','Module @testing-library/react manquant')},
+'cat .gitlab-ci.yml':{out:[T('stages: [build, test, deploy]'),T(''),T('test:'),T('  stage: test'),T('  script:'),T('    - npm test'),T('  # ⚠ npm install manquant avant npm test !','warn')],trig:['find']},
+'npm test':{out:[T('Cannot find module \'@testing-library/react\'','error')],trig:['find']},
+'npm install':{out:[T('added 847 packages in 12s','success')]},
+'cat package.json | grep jest':{out:[T('"@testing-library/react": "^14.0.0"'),T('"jest": "^29.0.0"')]},
+'nano .gitlab-ci.yml':{out:[T('Correction: ajout de "npm ci" avant "npm test"','success'),T('Sauvegardé.','success')],trig:['fix'],log:L('success','npm ci ajouté au stage test')},
+'pipeline_retry':{out:[T('Pipeline #848 started...','info'),T('  ✓ Stage: build — passed','success'),T('  ✓ Stage: test — passed','success'),T('  ✓ Stage: deploy — passed','success'),T('Pipeline #848 SUCCESS','success')],trig:['fix'],log:L('success','Pipeline #848 réussi'),mu:{'Pipeline':1,'Deploys bloqués':0,'Tests':1}},
+'hint':{out:[T('💡 1. pipeline_status pour l\'étape en échec','info'),T('2. pipeline_logs pour le détail'),T('3. cat .gitlab-ci.yml pour la config'),T('4. Ajouter npm ci + relancer')]}
+},
+{
+'pipeline_status':{out:[T('Pipeline #848 — Status: SUCCESS','success'),T('All stages passed ✓','success')],trig:['verify']}
+}));
+
+// ============================================================
+// CICD 2: Ansible qui plante
+// ============================================================
+SC.push(S('ansible','cicd','Playbook Ansible échoue','Le playbook de déploiement échoue sur les serveurs de prod.','medium','Moyen',
+{'Hosts OK':{v:0,max:5,u:'/5'},'Playbook':{v:0,max:1,u:'FAIL'},'Deploy':{v:0,max:100,u:'%'}},
+[O('diag','Identifier l\'erreur Ansible'),O('find','Trouver la cause'),O('fix','Corriger et relancer'),O('verify','Vérifier le déploiement')],
+[L('error','ALERT: Ansible playbook failed on all hosts'),L('error','UNREACHABLE and FAILED tasks'),L('info','Deploy team notified')],
+[T('🚨 INCIDENT P3 — Ansible playbook en échec','system'),T('Le déploiement Ansible échoue sur 5 serveurs.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('ansible-playbook deploy.yml --check'),T('ansible all -m ping      — Test connectivité'),T('cat deploy.yml           — Voir le playbook'),T('cat inventory.ini        — Voir l\'inventaire'),T('nano inventory.ini       — Éditer inventaire'),T('ssh srv-prod-01          — Test SSH direct'),T('ansible-playbook deploy.yml — Relancer'),T('hint                     — Indice')]},
+'ansible-playbook deploy.yml --check':{out:[T('PLAY [Deploy app to production]'),T(''),T('TASK [Gathering Facts]'),T('fatal: [srv-prod-01]: UNREACHABLE! => {"msg": "SSH Error: Connection refused"}','error'),T('fatal: [srv-prod-02]: UNREACHABLE!','error'),T('...all 5 hosts UNREACHABLE','error')],trig:['diag']},
+'ansible all -m ping':{out:[T('srv-prod-01 | UNREACHABLE! => SSH connection refused','error'),T('srv-prod-02 | UNREACHABLE!','error'),T('srv-prod-03 | UNREACHABLE!','error')],trig:['diag']},
+'cat deploy.yml':{out:[T('- hosts: production'),T('  become: yes'),T('  tasks:'),T('    - name: Deploy app'),T('      copy: src=app/ dest=/opt/app/'),T('    - name: Restart service'),T('      systemd: name=myapp state=restarted')]},
+'cat inventory.ini':{out:[T('[production]'),T('srv-prod-01 ansible_port=22'),T('srv-prod-02 ansible_port=22'),T('srv-prod-03 ansible_port=22'),T('srv-prod-04 ansible_port=22'),T('srv-prod-05 ansible_port=22'),T(''),T('[production:vars]'),T('ansible_user=deploy'),T('ansible_ssh_private_key_file=/home/deploy/.ssh/id_rsa_old','error'),T('⚠ La clé SSH a été changée récemment !','warn')],trig:['find'],log:L('warn','Inventaire pointe vers ancienne clé SSH')},
+'ssh srv-prod-01':{out:[T('Permission denied (publickey)','error'),T('→ La clé /home/deploy/.ssh/id_rsa_old ne fonctionne plus','warn')],trig:['find']},
+'nano inventory.ini':{out:[T('Correction: ansible_ssh_private_key_file=/home/deploy/.ssh/id_rsa','success'),T('Sauvegardé.','success')],trig:['fix'],log:L('success','Clé SSH corrigée dans inventaire')},
+'ansible-playbook deploy.yml':{out:[T('PLAY [Deploy app to production]'),T(''),T('TASK [Gathering Facts] — ok: 5/5','success'),T('TASK [Deploy app] — changed: 5/5','success'),T('TASK [Restart service] — changed: 5/5','success'),T(''),T('PLAY RECAP: ok=5 changed=5 failed=0','success')],trig:['fix'],log:L('success','Déploiement réussi sur 5 serveurs'),mu:{'Hosts OK':5,'Playbook':1,'Deploy':100}},
+'hint':{out:[T('💡 1. ansible all -m ping pour tester','info'),T('2. cat inventory.ini pour la config'),T('3. Vérifier la clé SSH'),T('4. nano inventory.ini + relancer')]}
+},
+{
+'ansible all -m ping':{out:[T('srv-prod-01 | SUCCESS','success'),T('srv-prod-02 | SUCCESS','success'),T('srv-prod-03 | SUCCESS','success'),T('srv-prod-04 | SUCCESS','success'),T('srv-prod-05 | SUCCESS','success')],trig:['verify']}
+}));
+
+// ============================================================
+// CICD 3: Déploiement casse la prod
+// ============================================================
+SC.push(S('rollback','cicd','Déploiement casse la prod','Le dernier déploiement a cassé l\'API, il faut rollback.','hard','Expert',
+{'API':{v:0,max:1,u:'DOWN'},'Erreurs 500':{v:100,max:100,u:'%'},'Version':{v:0,max:1,u:'BROKEN'}},
+[O('diag','Confirmer que le deploy a cassé la prod'),O('find','Identifier le commit problématique'),O('fix','Rollback vers la version stable'),O('verify','Vérifier le retour à la normale')],
+[L('error','ALERT: API returning 500 on all endpoints'),L('error','Deploy v2.5.0 completed 10 min ago'),L('warn','Errors started right after deployment'),L('info','On-call notified')],
+[T('🚨 INCIDENT P1 — Déploiement a cassé la prod','system'),T('L\'API retourne 500 depuis le dernier deploy.','system'),T('',''),T('Tapez "help" pour les commandes.','info')],
+{
+'help':{out:[T('=== COMMANDES DISPONIBLES ===','info'),T('curl api.company.com/health'),T('docker ps                — Containers actifs'),T('docker logs api-backend  — Logs API'),T('git log --oneline        — Historique commits'),T('git diff HEAD~1          — Diff dernier commit'),T('rollback_v2.4            — Rollback vers v2.4'),T('docker-compose up -d     — Relancer après rollback'),T('hint                     — Indice')]},
+'curl api.company.com/health':{out:[T('HTTP/1.1 500 Internal Server Error','error'),T('{"error":"Cannot read property of undefined"}','error')],trig:['diag']},
+'docker ps':{out:[T('api-backend  api:v2.5.0  Up 10 minutes')],trig:['diag']},
+'docker logs api-backend':{out:[T('TypeError: Cannot read property \'userId\' of undefined','error'),T('  at /app/routes/auth.js:42','error'),T('  at Layer.handle [as handle_request]','error'),T('Error repeating on every request...','error')],trig:['find'],log:L('warn','Bug: auth.js:42 — property undefined')},
+'git log --oneline':{out:[T('e4a2b1c (HEAD, v2.5.0) refactor: auth middleware','error'),T('7f3d8e9 (v2.4.0) fix: rate limiter'),T('a1b2c3d chore: update deps')],trig:['find']},
+'git diff HEAD~1':{out:[T('commit e4a2b1c — "refactor: auth middleware"'),T('- const userId = req.session.user.id;'),T('+ const userId = req.session.userId;    ← BUG','error'),T('→ req.session.userId n\'existe pas','warn')],trig:['find'],log:L('warn','Commit e4a2b1c: refactor auth cassé')},
+'rollback_v2.4':{out:[T('Rolling back to v2.4.0...','info'),T('Pulling api:v2.4.0...','info'),T('Updating docker-compose.yml...','info'),T('Image ready','success')],trig:['fix'],log:L('success','Rollback vers v2.4.0')},
+'docker-compose up -d':{out:[T('Recreating api-backend with api:v2.4.0...','info'),T('api-backend started','success')],trig:['fix'],log:L('success','v2.4.0 déployée'),mu:{'API':1,'Erreurs 500':0,'Version':1}},
+'hint':{out:[T('💡 1. docker logs pour voir l\'erreur','info'),T('2. git log pour le dernier commit'),T('3. git diff pour comprendre le bug'),T('4. rollback_v2.4 + docker-compose up')]}
+},
+{
+'curl api.company.com/health':{out:[T('HTTP/1.1 200 OK','success'),T('{"status":"healthy","version":"2.4.0"}','success')],trig:['verify']},
+'docker ps':{out:[T('api-backend  api:v2.4.0  Up 30 seconds','success')],trig:['verify']}
+}));
 
 // ============================================================
 // TUTORIAL
 // ============================================================
 const TUT=[
-{title:'Bienvenue, ingénieur !',html:'<p>Dans <strong>Incident Simulator</strong>, vous êtes l\'ingénieur on-call. Des incidents de production surviennent et c\'est à vous de les résoudre.</p><p>Mission : <strong>diagnostiquer</strong> → <strong>identifier</strong> → <strong>corriger</strong> → <strong>vérifier</strong>.</p>'},
-{title:"L'interface",html:'<p>📊 <strong>Panneau latéral</strong> — Métriques live, objectifs, logs monitoring.</p><p>⌨️ <strong>Terminal</strong> — Tapez vos commandes pour investiguer.</p><p>⏱️ <strong>Chronomètre</strong> en haut mesure votre temps.</p>'},
-{title:'Les commandes',html:'<p>Tapez <code>help</code> pour voir les commandes disponibles.</p><div class="ex">ops@server:~$ help<br>ops@server:~$ dig api.company.com<br>ops@server:~$ systemctl status named</div><p><code>hint</code> si bloqué. <strong>↑↓</strong> pour l\'historique. <strong>TAB</strong> pour compléter.</p>'},
-{title:'Les objectifs',html:'<p>Chaque incident a des objectifs dans l\'ordre :</p><p>1️⃣ <strong>Diagnostiquer</strong><br>2️⃣ <strong>Identifier</strong> la cause root<br>3️⃣ <strong>Corriger</strong><br>4️⃣ <strong>Vérifier</strong></p><p>Ils se complètent automatiquement avec les bonnes commandes.</p>'},
-{title:'Prêt à jouer !',html:'<p>🔍 Lisez les <strong>logs</strong> et <strong>sorties</strong> — les indices sont là.</p><p>🧠 Procédez <strong>méthodiquement</strong>.</p><p>⚡ Le chrono tourne, mais mieux vaut comprendre que taper au hasard !</p><p>Bonne chance ! 🚀</p>'}
+{title:'Bienvenue, ingénieur !',html:'<p>Dans <strong>Incident Simulator</strong>, vous êtes l\'ingénieur on-call. Des incidents de production surviennent et c\'est à vous de les résoudre le plus vite possible.</p><p>Mission : <strong>diagnostiquer</strong> → <strong>identifier</strong> → <strong>corriger</strong> → <strong>vérifier</strong>.</p>'},
+{title:"L'interface",html:'<p>📊 <strong>Panneau gauche</strong> — Métriques live, objectifs à compléter, logs monitoring.</p><p>⌨️ <strong>Terminal</strong> — Tapez vos commandes pour investiguer et résoudre.</p><p>⏱️ <strong>Chrono</strong> en haut mesure votre temps de résolution.</p>'},
+{title:'Les commandes',html:'<p>Tapez <code>help</code> pour la liste des commandes de chaque scénario.</p><div class="ex">ops@server:~$ help<br>ops@server:~$ systemctl status nginx<br>ops@server:~$ journalctl -u sshd</div><p><code>hint</code> si bloqué. <strong>↑↓</strong> historique. <strong>TAB</strong> complétion.</p>'},
+{title:'Les objectifs',html:'<p>Chaque incident a des objectifs :</p><p>1️⃣ <strong>Diagnostiquer</strong> le problème<br>2️⃣ <strong>Identifier</strong> la cause root<br>3️⃣ <strong>Corriger</strong> le problème<br>4️⃣ <strong>Vérifier</strong> le retour à la normale</p><p>Ils se complètent automatiquement avec les bonnes commandes.</p>'},
+{title:'C\'est parti !',html:'<p>🔍 Lisez les <strong>logs</strong> et <strong>sorties</strong> — les indices sont là.</p><p>🧠 Procédez <strong>méthodiquement</strong>.</p><p>⚡ Le chrono tourne, mais mieux vaut comprendre que taper au hasard !</p><p>6 catégories, 33 scénarios. Bonne chance ! 🚀</p>'}
 ];
 let tStep=0;
-function startTut(){tStep=0;showScreen('tut-screen');renderTut()}
+function startTut(){tStep=0;showScreen('tut');renderTut()}
 function renderTut(){const s=TUT[tStep],b=document.getElementById('tbox'),last=tStep===TUT.length-1,first=tStep===0;
-b.innerHTML=`<div class="step">Étape ${tStep+1}/${TUT.length}</div><h2>${s.title}</h2>${s.html}<div class="tnav">${first?'':'<button class="tbtn" onclick="tStep--;renderTut()">← Précédent</button>'}${last?'<button class="tbtn pri" onclick="showScreen(\'select-screen\')">Jouer ▶</button>':'<button class="tbtn pri" onclick="tStep++;renderTut()">Suivant →</button>'}</div>`}
+b.innerHTML='<div class="step">Étape '+(tStep+1)+'/'+TUT.length+'</div><h2>'+s.title+'</h2>'+s.html+'<div class="tnav">'+(first?'':'<button class="tbtn" onclick="tStep--;renderTut()">← Précédent</button>')+(last?'<button class="tbtn pri" onclick="showScreen(\'catscreen\')">Jouer ▶</button>':'<button class="tbtn pri" onclick="tStep++;renderTut()">Suivant →</button>')+'</div>'}
 
 // ============================================================
 // GAME STATE
 // ============================================================
-let G={sc:null,t0:null,iv:null,sec:0,hist:[],hi:-1,done:new Set(),fixed:false,cc:0};
+let G={sc:null,t0:null,iv:null,sec:0,hist:[],hi:-1,done:new Set(),fixed:false,cc:0,curCat:null};
 
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='select-screen')renderCards();if(id==='game-screen')document.getElementById('tinput').focus()}
+function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});document.getElementById(id).classList.add('active');if(id==='catscreen')renderCats();if(id==='game')document.getElementById('tinput').focus()}
 
-function renderCards(){const g=document.getElementById('sgrid');g.innerHTML='';SC.forEach(s=>{const d=document.createElement('div');d.className='scard';d.innerHTML=`<div class="ci">${s.icon}</div><h3>${s.title}</h3><p>${s.desc}</p><div class="cmeta"><span class="ctag t${s.diff==='easy'?'easy':s.diff==='medium'?'med':'hard'}">${s.dl}</span><span class="ctag" style="background:rgba(59,130,246,.15);color:var(--blue)">${s.objs.length} obj.</span></div>`;d.onclick=()=>startGame(s);g.appendChild(d)})}
+// ============================================================
+// CATEGORY RENDERING
+// ============================================================
+function renderCats(){
+var g=document.getElementById('catgrid');g.innerHTML='';
+CATS.forEach(function(c){
+var scenCount=SC.filter(function(s){return s.cat===c.id}).length;
+var d=document.createElement('div');
+d.className='catcard '+c.css;
+d.innerHTML='<span class="ci">'+c.icon+'</span><h3>'+c.name+'</h3><span class="ccount">'+scenCount+' scénarios</span>';
+d.onclick=function(){G.curCat=c.id;showScreen('selscreen');renderScens(c)};
+g.appendChild(d);
+});
+}
 
-function startGame(sc){G={sc:JSON.parse(JSON.stringify(sc)),t0:Date.now(),iv:null,sec:0,hist:[],hi:-1,done:new Set(),fixed:false,cc:0};
+// ============================================================
+// SCENARIO RENDERING
+// ============================================================
+function renderScens(cat){
+document.getElementById('selTitle').innerHTML=cat.icon+' '+cat.name;
+var g=document.getElementById('sgrid');g.innerHTML='';
+var scens=SC.filter(function(s){return s.cat===cat.id});
+scens.forEach(function(s){
+var d=document.createElement('div');d.className='scard';
+var dtag=s.diff==='easy'?'teasy':s.diff==='medium'?'tmed':'thard';
+d.innerHTML='<h3>'+s.title+'</h3><p>'+s.desc+'</p><div class="cmeta"><span class="ctag '+dtag+'">'+s.dl+'</span><span class="ctag" style="background:rgba(59,130,246,.12);color:var(--blue)">'+s.objs.length+' obj.</span></div>';
+d.onclick=function(){startGame(s)};
+g.appendChild(d);
+});
+}
+
+// ============================================================
+// GAME ENGINE
+// ============================================================
+function startGame(sc){
+G={sc:JSON.parse(JSON.stringify(sc)),t0:Date.now(),iv:null,sec:0,hist:[],hi:-1,done:new Set(),fixed:false,cc:0,curCat:G.curCat};
 document.getElementById('gsname').textContent=sc.title;
-const b=document.getElementById('badge');b.className='badge';b.innerHTML='<span>●</span> INCIDENT EN COURS';
+var b=document.getElementById('badge');b.className='badge';b.innerHTML='<span>●</span> INCIDENT EN COURS';
 renderMet();renderObj();
-const lp=document.getElementById('lpanel');lp.innerHTML='<div style="padding:0 0 8px"><h4 style="font-family:JetBrains Mono,monospace;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--dim)">Monitoring</h4></div>';
-sc.initLogs.forEach(l=>addLog(l.c,l.m));
-const to=document.getElementById('tout');to.innerHTML='';sc.initOut.forEach(l=>appOut(l.t,l.c));
-document.getElementById('timer').textContent='00:00';G.iv=setInterval(tick,1000);showScreen('game-screen')}
+var lp=document.getElementById('lpanel');
+lp.innerHTML='<div style="padding:0 0 8px"><h4 style="font-family:IBM Plex Mono,monospace;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--dim)">Monitoring</h4></div>';
+sc.initLogs.forEach(function(l){addLog(l.c,l.m)});
+var to=document.getElementById('tout');to.innerHTML='';
+sc.initOut.forEach(function(l){appOut(l.t,l.c)});
+document.getElementById('timer').textContent='00:00';
+G.iv=setInterval(tick,1000);
+showScreen('game');
+}
 
-function renderMet(){const p=document.getElementById('mpanel'),m=G.sc.metrics;p.innerHTML='<h4>Métriques Live</h4>';
-Object.entries(m).forEach(([n,d])=>{const pct=(d.v/d.max)*100,col=pct>80?'var(--red)':pct>50?'var(--orange)':'var(--green)';
-p.innerHTML+=`<div class="met"><span class="ml">${n}</span><span class="mv" style="color:${col}">${d.v}${d.u}</span></div><div class="mbar"><div class="mfill" style="width:${pct}%;background:${col}"></div></div>`})}
+function renderMet(){
+var p=document.getElementById('mpanel'),m=G.sc.metrics;
+p.innerHTML='<h4>Métriques Live</h4>';
+Object.keys(m).forEach(function(n){
+var d=m[n],pct=(d.v/d.max)*100;
+var col=pct>80?'var(--red)':pct>50?'var(--orange)':'var(--green)';
+p.innerHTML+='<div class="met"><span class="ml">'+n+'</span><span class="mv" style="color:'+col+'">'+d.v+d.u+'</span></div><div class="mbar"><div class="mfill" style="width:'+pct+'%;background:'+col+'"></div></div>';
+});
+}
 
-function renderObj(){const l=document.getElementById('olist');l.innerHTML='';G.sc.objs.forEach(o=>{const d=G.done.has(o.id);l.innerHTML+=`<li class="obj ${d?'done':''}"><span class="ck">${d?'✓':''}</span>${o.t}</li>`})}
+function renderObj(){
+var l=document.getElementById('olist');l.innerHTML='';
+G.sc.objs.forEach(function(o){
+var d=G.done.has(o.id);
+l.innerHTML+='<li class="obj '+(d?'done':'')+'"><span class="ck">'+(d?'✓':'')+'</span>'+o.t+'</li>';
+});
+}
 
-function tick(){G.sec++;const m=String(Math.floor(G.sec/60)).padStart(2,'0'),s=String(G.sec%60).padStart(2,'0');document.getElementById('timer').textContent=`${m}:${s}`}
+function tick(){G.sec++;var m=String(Math.floor(G.sec/60)).padStart(2,'0'),s=String(G.sec%60).padStart(2,'0');document.getElementById('timer').textContent=m+':'+s}
 
-function appOut(text,cls=''){const o=document.getElementById('tout'),d=document.createElement('div');d.className=`ol${cls?' o-'+cls:''}`;d.textContent=text;o.appendChild(d);o.scrollTop=o.scrollHeight}
+function appOut(text,cls){
+var o=document.getElementById('tout'),d=document.createElement('div');
+d.className='ol'+(cls?' o-'+cls:'');d.textContent=text||'';
+o.appendChild(d);o.scrollTop=o.scrollHeight;
+}
 
-function addLog(cls,msg){const p=document.getElementById('lpanel'),t=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),d=document.createElement('div');d.className=`le ${cls}`;d.innerHTML=`<span class="lt">[${t}]</span> ${msg}`;p.appendChild(d);p.scrollTop=p.scrollHeight}
+function addLog(cls,msg){
+var p=document.getElementById('lpanel');
+var t=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+var d=document.createElement('div');d.className='le '+cls;
+d.innerHTML='<span class="lt">['+t+']</span> '+msg;
+p.appendChild(d);p.scrollTop=p.scrollHeight;
+}
 
-function compObj(id){if(G.done.has(id))return;G.done.add(id);renderObj();if(G.sc.objs.every(o=>G.done.has(o.id)))setTimeout(()=>endGame(true),800)}
+function compObj(id){
+if(G.done.has(id))return;
+G.done.add(id);renderObj();
+if(G.sc.objs.every(function(o){return G.done.has(o.id)}))setTimeout(function(){endGame(true)},800);
+}
 
-function proc(cmd){const c=cmd.trim();if(!c)return;G.hist.push(c);G.hi=G.hist.length;G.cc++;appOut(`ops@server:~$ ${c}`,'');
-const sc=G.sc;
+function proc(cmd){
+var c=cmd.trim();if(!c)return;
+G.hist.push(c);G.hi=G.hist.length;G.cc++;
+appOut('ops@server:~$ '+c,'');
+var sc=G.sc;
 // post-fix commands
-if(G.fixed&&sc.postCmds&&sc.postCmds[c]){const d=sc.postCmds[c];d.out.forEach(l=>appOut(l.t,l.c));if(d.trig)d.trig.forEach(compObj);if(d.log)addLog(d.log.c,d.log.m);return}
-const d=sc.cmds[c];
-if(!d){const pk=Object.keys(sc.cmds).find(k=>c.startsWith(k.split(' ')[0])&&k!=='help'&&k!=='hint');
-if(pk&&c!==pk)appOut(`Essayez: ${pk}`,'warn');else{appOut(`bash: ${c.split(' ')[0]}: command not found`,'error');appOut('Tapez "help" pour la liste.',"info")}return}
-if(d.dyn){if(!G.fixed){if(c.includes('curl'))appOut('curl: (7) Failed to connect','error');else if(c==='pm2 status')appOut('│ app │ online │ 34% │ 1.8GB │','error')}return}
-d.out.forEach(l=>appOut(l.t,l.c));
-if(d.trig)d.trig.forEach(t=>{if(t==='fix')G.fixed=true;compObj(t)});
+if(G.fixed&&sc.postCmds&&sc.postCmds[c]){
+var d=sc.postCmds[c];
+d.out.forEach(function(l){appOut(l.t,l.c)});
+if(d.trig)d.trig.forEach(compObj);
 if(d.log)addLog(d.log.c,d.log.m);
-if(d.mu){Object.entries(d.mu).forEach(([k,v])=>{if(sc.metrics[k])sc.metrics[k].v=v});renderMet()}
-if(G.fixed){const b=document.getElementById('badge');b.className='badge ok';b.innerHTML='<span>●</span> STABILISATION'}}
+if(d.mu){Object.keys(d.mu).forEach(function(k){if(sc.metrics[k])sc.metrics[k].v=d.mu[k]});renderMet()}
+return;
+}
+var d=sc.cmds[c];
+if(!d){
+var keys=Object.keys(sc.cmds);
+var partial=keys.find(function(k){return c.startsWith(k.split(' ')[0])&&k!=='help'&&k!=='hint'});
+if(partial&&c!==partial){appOut('Essayez: '+partial,'warn')}
+else{appOut('bash: '+c.split(' ')[0]+': command not found','error');appOut('Tapez "help" pour la liste.','info')}
+return;
+}
+if(d.dyn){
+if(!G.fixed){appOut('Service unavailable or command has no effect yet.','warn')}
+return;
+}
+d.out.forEach(function(l){appOut(l.t,l.c)});
+if(d.trig)d.trig.forEach(function(t){if(t==='fix')G.fixed=true;compObj(t)});
+if(d.log)addLog(d.log.c,d.log.m);
+if(d.mu){Object.keys(d.mu).forEach(function(k){if(sc.metrics[k])sc.metrics[k].v=d.mu[k]});renderMet()}
+if(G.fixed){var b=document.getElementById('badge');b.className='badge ok';b.innerHTML='<span>●</span> STABILISATION'}
+}
 
-function endGame(ok){clearInterval(G.iv);const m=Math.floor(G.sec/60),s=G.sec%60,ts=`${m}m ${String(s).padStart(2,'0')}s`;
-let r,rc;if(G.sec<120){r='S';rc='var(--purple)'}else if(G.sec<240){r='A';rc='var(--green)'}else if(G.sec<360){r='B';rc='var(--cyan)'}else if(G.sec<480){r='C';rc='var(--orange)'}else{r='D';rc='var(--red)'}
-const sid=G.sc.id;
-document.getElementById('rbox').innerHTML=`<div class="ricon">${ok?'✅':'❌'}</div><h2 style="color:${ok?'var(--green)':'var(--red)'}">${ok?'Incident Résolu !':'Non Résolu'}</h2><p class="rsub">${G.sc.title}</p><div class="rstats"><div class="rst"><div class="rv">${ts}</div><div class="rl">Temps</div></div><div class="rst"><div class="rv" style="color:${rc}">${r}</div><div class="rl">Note</div></div><div class="rst"><div class="rv">${G.done.size}/${G.sc.objs.length}</div><div class="rl">Objectifs</div></div><div class="rst"><div class="rv">${G.cc}</div><div class="rl">Commandes</div></div></div><div class="racts"><button onclick="showScreen('select-screen')">Autre scénario</button><button class="pri" onclick="startGame(SC.find(s=>s.id==='${sid}'))">Rejouer ▶</button></div>`;
-showScreen('res-screen')}
+function endGame(ok){
+clearInterval(G.iv);
+var m=Math.floor(G.sec/60),s=G.sec%60,ts=m+'m '+String(s).padStart(2,'0')+'s';
+var r,rc;
+if(G.sec<90){r='S';rc='var(--purple)'}
+else if(G.sec<180){r='A';rc='var(--green)'}
+else if(G.sec<300){r='B';rc='var(--cyan)'}
+else if(G.sec<420){r='C';rc='var(--orange)'}
+else{r='D';rc='var(--red)'}
+var sid=G.sc.id;
+document.getElementById('rbox').innerHTML='<div class="ricon">'+(ok?'✅':'❌')+'</div><h2 style="color:'+(ok?'var(--green)':'var(--red)')+'">'+(ok?'Incident Résolu !':'Non Résolu')+'</h2><p class="rsub">'+G.sc.title+'</p><div class="rstats"><div class="rst"><div class="rv">'+ts+'</div><div class="rl">Temps</div></div><div class="rst"><div class="rv" style="color:'+rc+'">'+r+'</div><div class="rl">Note</div></div><div class="rst"><div class="rv">'+G.done.size+'/'+G.sc.objs.length+'</div><div class="rl">Objectifs</div></div><div class="rst"><div class="rv">'+G.cc+'</div><div class="rl">Commandes</div></div></div><div class="racts"><button onclick="showScreen(\'selscreen\');renderScens(CATS.find(function(c){return c.id===\''+G.curCat+'\'}))">Autre scénario</button><button class="pri" onclick="startGame(SC.find(function(s){return s.id===\''+sid+'\'}))">Rejouer ▶</button></div>';
+showScreen('res');
+}
 
-function quitGame(){clearInterval(G.iv);showScreen('select-screen')}
+function quitGame(){clearInterval(G.iv);showScreen('catscreen')}
 
-// INPUT
-const inp=document.getElementById('tinput');
-inp.addEventListener('keydown',e=>{
+// ============================================================
+// INPUT HANDLING
+// ============================================================
+var inp=document.getElementById('tinput');
+inp.addEventListener('keydown',function(e){
 if(e.key==='Enter'){proc(inp.value);inp.value=''}
 else if(e.key==='ArrowUp'){e.preventDefault();if(G.hist.length&&G.hi>0){G.hi--;inp.value=G.hist[G.hi]}}
 else if(e.key==='ArrowDown'){e.preventDefault();if(G.hi<G.hist.length-1){G.hi++;inp.value=G.hist[G.hi]}else{G.hi=G.hist.length;inp.value=''}}
-else if(e.key==='Tab'){e.preventDefault();const p=inp.value.trim();if(p&&G.sc){const a=Object.keys(G.sc.cmds),m=a.find(c=>c.startsWith(p)&&c!==p);if(m)inp.value=m}}
+else if(e.key==='Tab'){e.preventDefault();var p=inp.value.trim();if(p&&G.sc){var a=Object.keys(G.sc.cmds);if(G.sc.postCmds)a=a.concat(Object.keys(G.sc.postCmds));var m=a.find(function(c){return c.startsWith(p)&&c!==p});if(m)inp.value=m}}
 });
-document.getElementById('game-screen').addEventListener('click',()=>inp.focus());
-renderCards();
+document.getElementById('game').addEventListener('click',function(){inp.focus()});
+renderCats();
 </script>
 </body>
 </html>
